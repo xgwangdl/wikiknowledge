@@ -43,7 +43,13 @@ class ChatServiceTest {
 
     @BeforeEach
     void setUp() {
-        chatService = new ChatService(ragService, sessionService, messageRepository, new ObjectMapper());
+        chatService = new ChatService(
+                ragService,
+                sessionService,
+                messageRepository,
+                new ObjectMapper(),
+                new PromptGuardService()
+        );
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.wikiknowledge.exception;
 
 import com.wikiknowledge.common.ApiError;
+import com.wikiknowledge.common.RateLimitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ApiError(403, "FORBIDDEN", "没有权限操作该资源"));
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ApiError> handleRateLimit(RateLimitException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ApiError(429, "RATE_LIMITED", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

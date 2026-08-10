@@ -43,6 +43,7 @@ wikiknowledge/
 - [x] 管理后台与前端（Vue 3 + Element Plus）
 - [x] Docker Compose 部署与 GitHub Actions CI
 - [x] 黄金评估集与评估报告
-- [ ] 性能与安全加固
+- [x] 性能与安全加固（Redis 限流、提示注入防护、traceId 日志）
+- [ ] README 完善与面试准备材料
 - [ ] 管理后台
 - [ ] 测试与部署

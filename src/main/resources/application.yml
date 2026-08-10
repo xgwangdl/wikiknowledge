@@ -43,9 +43,16 @@ app:
     password: ${ADMIN_PASSWORD:admin123}
   storage:
     root: ${STORAGE_ROOT:./data}
+  rate-limit:
+    per-minute: ${RATE_LIMIT_PER_MINUTE:20}
+    per-day: ${RATE_LIMIT_PER_DAY:500}
 
 server:
   port: 8080
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-}] %logger{50} - %msg%n"
 
 management:
   endpoints:

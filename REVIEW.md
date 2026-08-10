@@ -88,6 +88,14 @@
 - 评估结果与聚合指标（JSON）落库，接口仅管理员可访问
 - `EvalSetServiceTest`、`EvalRunnerTest`
 
+性能与安全加固：
+
+- Redis 全局限流：每用户每分钟 20 次、每天 500 次，可通过环境变量调整
+- 限流命中返回 429 `RATE_LIMITED`
+- 提问前做提示注入防护和 2000 字符长度限制
+- `traceId` 日志链路：请求头透传，控制台日志带 traceId
+- `RateLimitServiceTest`、`PromptGuardServiceTest`
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -171,6 +179,12 @@ RAG 模块补充问题：
 32. MRR 在什么情况下会比 Recall 更敏感？
 33. 为什么评估接口要限制为 `ROLE_ADMIN`？
 
+安全加固补充问题：
+
+34. Redis 限流的 key 为什么包含“用户名 + IP + 分钟桶”？
+35. 提示注入防护为什么放在 ChatService 而不是 Controller？
+36. `traceId` 对排查线上问题有什么帮助？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -183,12 +197,12 @@ RAG 模块补充问题：
 - 前端 dev server：`http://localhost:5173`
 - `docker compose config` 校验通过，包含 4 个服务
 - `mvn test` 共 39 个测试全部通过（新增评估模块 3 个）
+- `mvn test` 共 44 个测试全部通过（新增安全加固 5 个）
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 性能与安全加固
-2. README 完善与面试准备材料
+1. README 完善与面试准备材料
 
 ## 如何 review
 

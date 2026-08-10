@@ -23,18 +23,22 @@ public class ChatService {
     private final SessionService sessionService;
     private final MessageRepository messageRepository;
     private final ObjectMapper objectMapper;
+    private final PromptGuardService promptGuardService;
 
     public ChatService(RagService ragService,
                        SessionService sessionService,
                        MessageRepository messageRepository,
-                       ObjectMapper objectMapper) {
+                       ObjectMapper objectMapper,
+                       PromptGuardService promptGuardService) {
         this.ragService = ragService;
         this.sessionService = sessionService;
         this.messageRepository = messageRepository;
         this.objectMapper = objectMapper;
+        this.promptGuardService = promptGuardService;
     }
 
     public Flux<ServerSentEvent<RagEvent>> chat(ChatRequest request, String username) {
+        promptGuardService.validate(request.question());
         Session session;
         if (request.sessionId() == null) {
             session = sessionService.createSession(
