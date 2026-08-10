@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: wikiknowledge-postgres
+    environment:
+      POSTGRES_DB: wikiknowledge
+      POSTGRES_USER: wikiknowledge
+      POSTGRES_PASSWORD: wikiknowledge
+    ports:
+      - "5432:5432"
+    volumes:
+      - wikiknowledge-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wikiknowledge -d wikiknowledge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: wikiknowledge-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - wikiknowledge-redisdata:/data
+
+volumes:
+  wikiknowledge-pgdata:
+  wikiknowledge-redisdata:
