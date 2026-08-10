@@ -23,11 +23,13 @@
    - 当前稳定 GA 版本，避免使用 Milestone/SNAPSHOT 版本。
 3. 为什么用 DashScope OpenAI 兼容接口，而不是 Spring AI Alibaba starter？
    - Spring AI Alibaba 在 Maven Central 上仍停留在 1.0.0-M6.1 Milestone；用官方 Spring AI + OpenAI 兼容协议更稳定，通义千问同样可用。
-4. 为什么用 PostgreSQL + pgvector？
+4. 为什么本轮还没有引入 Spring AI starter？
+   - Spring AI 的 OpenAI starter 在没有 API Key 时连应用都无法启动；为了让骨架先跑通数据库和健康检查，AI 依赖会在 RAG 模块阶段再引入。
+5. 为什么用 PostgreSQL + pgvector？
    - 向量检索和业务数据可以放在同一个数据库，降低运维复杂度，是生产环境常见方案。
-5. 为什么用 Flyway？
+6. 为什么用 Flyway？
    - 数据库结构像代码一样版本化管理，部署和团队协作更可靠。
-6. 为什么先做单体而不是微服务？
+7. 为什么先做单体而不是微服务？
    - 业务规模和学习成本都不适合微服务，单体 + 分层足够，也更容易讲清楚。
 
 ## 请重点理解的问题
@@ -42,13 +44,16 @@
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
-- 尚未启动数据库，因此本轮未验证运行态；下一步会安装/启动 Docker 后跑通健康检查。
+- `docker compose up -d` 已启动 PostgreSQL 16 + Redis 7
+- Flyway 已执行 `V1__init_core_schema.sql`，8 张核心表创建成功
+- 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
+- 应用进程仍在后台运行，方便你直接验证
 
 ## 下一轮计划
 
-1. 启动 PostgreSQL + Redis，跑通 Flyway 和 `/actuator/health`
-2. 引入 Spring Security + JWT 登录注册
-3. 再做知识库和文档管理
+1. 引入 Spring Security + JWT 登录注册
+2. 再做知识库和文档管理
+3. 再实现文档解析与 RAG
 
 ## 如何 review
 

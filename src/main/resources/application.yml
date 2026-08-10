@@ -22,17 +22,6 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
-  ai:
-    openai:
-      base-url: ${AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
-      api-key: ${AI_API_KEY:}
-      chat:
-        options:
-          model: ${AI_CHAT_MODEL:qwen-plus}
-      embedding:
-        options:
-          model: ${AI_EMBEDDING_MODEL:text-embedding-v3}
-
 server:
   port: 8080
 
