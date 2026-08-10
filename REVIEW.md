@@ -62,6 +62,15 @@
 - `ChatService` 负责聊天编排，`RagService` 保持纯检索与流式生成
 - `SessionServiceTest`、`ChatServiceTest`
 
+前端：
+
+- Vue 3 + Element Plus + Vite 单页应用
+- 登录/注册、知识库管理、文档上传、SSE 流式聊天
+- `axios` 统一携带 JWT，401 自动跳转登录
+- `fetch` 读取 SSE 流，实时渲染回答增量
+- Vite 开发代理 `/api -> localhost:8080`
+- `npm run build` 已通过，dev server 运行在 `http://localhost:5173`
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -127,6 +136,12 @@ RAG 模块补充问题：
 23. 为什么会话详情只允许本人访问？在哪一层做的校验？
 24. `citations` 为什么要改成 TEXT？JSONB 和 TEXT 各有什么取舍？
 
+前端补充问题：
+
+25. 为什么 `streamChat` 用 `fetch` 而不是 `axios`？
+26. SSE 的 `start` 事件返回 `sessionId` 后，前端为什么要保存它？
+27. 为什么 Vite 要把 `/api` 代理到后端，而不是直接跨域请求？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -135,12 +150,14 @@ RAG 模块补充问题：
 - 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
 - 应用进程仍在后台运行，方便你直接验证
 - `mvn test` 通过：共 36 个测试全部通过（新增会话 4 个 + 聊天编排 2 个）
+- `npm install` + `npm run build` 通过
+- 前端 dev server：`http://localhost:5173`
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 管理后台与前端
-2. 评估集与部署
+1. Docker Compose 部署与 GitHub Actions CI
+2. 黄金评估集与评估报告
 3. 性能与安全加固
 
 ## 如何 review
