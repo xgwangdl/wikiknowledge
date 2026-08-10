@@ -199,6 +199,7 @@ RAG 模块补充问题：
 - `mvn test` 共 39 个测试全部通过（新增评估模块 3 个）
 - `mvn test` 共 44 个测试全部通过（新增安全加固 5 个）
 - 已补充完整 [README.md](README.md) 与 [INTERVIEW_PREP.md](INTERVIEW_PREP.md)
+- 已新增 [scripts/api_smoke_test.ps1](scripts/api_smoke_test.ps1) 全链路联调脚本
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划

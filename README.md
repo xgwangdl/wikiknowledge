@@ -81,6 +81,16 @@ npm run dev
 
 前端开发服务器：http://localhost:5173，Vite 会把 `/api` 代理到 `http://localhost:8080`。
 
+### 4. API 全链路联调
+
+后端启动后，执行：
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/api_smoke_test.ps1
+```
+
+脚本会自动完成：登录 -> 建库 -> 上传样例文档 -> 等待解析 -> 建会话 -> SSE 问答。
+
 ## API 概览
 
 ### 认证
