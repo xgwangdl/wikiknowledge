@@ -42,6 +42,7 @@ wikiknowledge/
 - [x] 会话历史与消息持久化
 - [x] 管理后台与前端（Vue 3 + Element Plus）
 - [x] Docker Compose 部署与 GitHub Actions CI
-- [ ] 黄金评估集与评估报告
+- [x] 黄金评估集与评估报告
+- [ ] 性能与安全加固
 - [ ] 管理后台
 - [ ] 测试与部署

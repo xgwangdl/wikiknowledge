@@ -80,6 +80,14 @@
 - GitHub Actions：后端测试、前端构建、两个 Docker 镜像构建
 - `docker compose config` 校验通过
 
+黄金评估集：
+
+- `eval_sets` / `eval_questions` / `eval_runs` / `eval_results` 四张评估表
+- 评估集 CRUD，题目包含问题、期望答案、期望命中的 chunk id
+- 运行评估时逐题向量检索，计算 Recall@k、Precision@k、MRR
+- 评估结果与聚合指标（JSON）落库，接口仅管理员可访问
+- `EvalSetServiceTest`、`EvalRunnerTest`
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -157,6 +165,12 @@ RAG 模块补充问题：
 29. 后端 Dockerfile 为什么要分两个阶段？
 30. CI 里为什么先跑测试再打 Docker 镜像？
 
+评估模块补充问题：
+
+31. Recall@k 和 Precision@k 分别衡量检索的什么问题？
+32. MRR 在什么情况下会比 Recall 更敏感？
+33. 为什么评估接口要限制为 `ROLE_ADMIN`？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -168,13 +182,13 @@ RAG 模块补充问题：
 - `npm install` + `npm run build` 通过
 - 前端 dev server：`http://localhost:5173`
 - `docker compose config` 校验通过，包含 4 个服务
+- `mvn test` 共 39 个测试全部通过（新增评估模块 3 个）
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 黄金评估集与评估报告
-2. 性能与安全加固
-3. README 与面试准备材料
+1. 性能与安全加固
+2. README 完善与面试准备材料
 
 ## 如何 review
 
