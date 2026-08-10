@@ -22,6 +22,16 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:wikiknowledge-dev-secret-key-change-me-2026-0123456789}
+    access-token-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:30}
+    refresh-token-ttl-days: ${JWT_REFRESH_TTL_DAYS:7}
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
+
 server:
   port: 8080
 

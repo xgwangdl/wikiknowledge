@@ -15,6 +15,16 @@
   - `.env.example`：环境变量模板
   - `REQUIREMENTS.md`：需求文档
 
+本轮新增：
+
+- Spring Security + JWT 登录认证
+- 注册、登录、刷新令牌、登出、当前用户接口
+- Redis 存储 refresh token，实现刷新轮换
+- BCrypt 密码加密
+- 管理员种子账号
+- 统一 401/403/400 JSON 错误响应
+- `JwtServiceTest` 与 `AuthServiceTest` 单元测试
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -31,6 +41,10 @@
    - 数据库结构像代码一样版本化管理，部署和团队协作更可靠。
 7. 为什么先做单体而不是微服务？
    - 业务规模和学习成本都不适合微服务，单体 + 分层足够，也更容易讲清楚。
+8. 为什么 refresh token 要存 Redis 而不是无状态？
+   - 刷新令牌需要支持登出失效和轮换，存 Redis 可以在服务端主动吊销，比纯无状态 JWT 更安全。
+9. 为什么密码用 BCrypt 而不是 MD5/SHA？
+   - BCrypt 自带盐和慢哈希，能抵抗彩虹表和暴力破解。
 
 ## 请重点理解的问题
 
@@ -41,6 +55,13 @@
 5. `docker-compose.yml` 为什么单独挂载数据卷？
 6. 如果本地没有数据库，项目能直接启动吗？为什么？
 
+认证模块补充问题：
+
+7. JWT 过滤器为什么放在 `UsernamePasswordAuthenticationFilter` 之前？
+8. Access Token 和 Refresh Token 的过期时间为什么不一样？
+9. 为什么 `logout` 只删除 Redis 中的 refresh token，而不处理 access token？
+10. 如果 JWT 密钥泄漏，会有什么风险？生产环境应该怎么配置？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -48,11 +69,13 @@
 - Flyway 已执行 `V1__init_core_schema.sql`，8 张核心表创建成功
 - 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
 - 应用进程仍在后台运行，方便你直接验证
+- `mvn test` 通过：`AuthServiceTest` 6 个用例 + `JwtServiceTest` 2 个用例，共 8 个测试全部通过
+- 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 引入 Spring Security + JWT 登录注册
-2. 再做知识库和文档管理
+1. 知识库管理：创建/编辑/删除/列表
+2. 文档上传与解析
 3. 再实现文档解析与 RAG
 
 ## 如何 review

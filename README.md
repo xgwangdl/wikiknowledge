@@ -35,7 +35,7 @@ wikiknowledge/
 - [x] 项目初始化
 - [x] 工程骨架（Maven + Spring Boot + 基础配置）
 - [x] 本地 PostgreSQL/Redis + Flyway + 健康检查
-- [ ] 登录认证
+- [x] 登录认证（Spring Security + JWT + 刷新令牌）
 - [ ] 知识库管理
 - [ ] 文档解析与 RAG
 - [ ] 管理后台
