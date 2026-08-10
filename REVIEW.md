@@ -25,6 +25,14 @@
 - 统一 401/403/400 JSON 错误响应
 - `JwtServiceTest` 与 `AuthServiceTest` 单元测试
 
+知识库管理：
+
+- 创建、编辑、删除、列表、详情接口
+- 普通用户只能管理自己创建的知识库
+- 管理员可以管理所有知识库
+- 删除知识库依赖数据库外键级联删除文档与切片
+- `KnowledgeBaseServiceTest` 单元测试
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -45,6 +53,8 @@
    - 刷新令牌需要支持登出失效和轮换，存 Redis 可以在服务端主动吊销，比纯无状态 JWT 更安全。
 9. 为什么密码用 BCrypt 而不是 MD5/SHA？
    - BCrypt 自带盐和慢哈希，能抵抗彩虹表和暴力破解。
+10. 知识库的 owner 权限为什么要放在 Service 层校验？
+    - 控制器只负责参数和响应，权限规则集中在业务层，测试和维护都更清晰。
 
 ## 请重点理解的问题
 
@@ -62,6 +72,12 @@
 9. 为什么 `logout` 只删除 Redis 中的 refresh token，而不处理 access token？
 10. 如果 JWT 密钥泄漏，会有什么风险？生产环境应该怎么配置？
 
+知识库模块补充问题：
+
+11. 为什么删除知识库时没有手动删除文档和切片？
+12. `AccessDeniedException` 为什么能统一转成 403 JSON？
+13. 如果以后要支持“共享知识库”，现有 owner 模型要改哪里？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -69,14 +85,14 @@
 - Flyway 已执行 `V1__init_core_schema.sql`，8 张核心表创建成功
 - 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
 - 应用进程仍在后台运行，方便你直接验证
-- `mvn test` 通过：`AuthServiceTest` 6 个用例 + `JwtServiceTest` 2 个用例，共 8 个测试全部通过
+- `mvn test` 通过：`AuthServiceTest` 6 个 + `JwtServiceTest` 2 个 + `KnowledgeBaseServiceTest` 7 个，共 15 个测试全部通过
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 知识库管理：创建/编辑/删除/列表
-2. 文档上传与解析
-3. 再实现文档解析与 RAG
+1. 文档上传与解析
+2. 再实现文档切片与向量化
+3. 再实现 RAG 问答
 
 ## 如何 review
 

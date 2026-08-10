@@ -36,7 +36,7 @@ wikiknowledge/
 - [x] 工程骨架（Maven + Spring Boot + 基础配置）
 - [x] 本地 PostgreSQL/Redis + Flyway + 健康检查
 - [x] 登录认证（Spring Security + JWT + 刷新令牌）
-- [ ] 知识库管理
+- [x] 知识库管理（创建/编辑/删除/列表 + 权限控制）
 - [ ] 文档解析与 RAG
 - [ ] 管理后台
 - [ ] 测试与部署
