@@ -53,7 +53,7 @@ class RagServiceTest {
         when(embeddingService.toVectorLiteral(any())).thenReturn("[0.1]");
         when(chunkRepository.searchSimilar(eq(1L), eq("[0.1]"), eq(5))).thenReturn(List.of());
 
-        List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题"))
+        List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题", null, null))
                 .map(serverEvent -> serverEvent.data())
                 .collectList()
                 .block();
@@ -72,7 +72,7 @@ class RagServiceTest {
         when(chunkRepository.searchSimilar(eq(1L), eq("[0.1]"), eq(5))).thenReturn(List.of(match));
         when(chatModelProvider.getIfAvailable()).thenReturn(null);
 
-        List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题"))
+        List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题", null, null))
                 .map(serverEvent -> serverEvent.data())
                 .collectList()
                 .block();
@@ -95,7 +95,7 @@ class RagServiceTest {
         when(chatModelProvider.getIfAvailable()).thenReturn(chatModel);
         when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.empty());
 
-        List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题"))
+        List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题", null, null))
                 .map(serverEvent -> serverEvent.data())
                 .collectList()
                 .block();

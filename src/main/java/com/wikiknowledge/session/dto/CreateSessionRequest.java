@@ -1,12 +1,9 @@
-package com.wikiknowledge.rag.dto;
+package com.wikiknowledge.session.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record ChatRequest(
+public record CreateSessionRequest(
         @NotNull Long knowledgeBaseId,
-        @NotBlank String question,
-        Long sessionId,
         @Size(max = 100) String title) {
 }

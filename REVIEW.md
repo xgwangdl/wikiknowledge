@@ -53,6 +53,15 @@
 - 使用 DashScope OpenAI 兼容接口；未配置 API Key 时应用可启动，但 AI 调用会失败
 - `EmbeddingServiceTest`、`RagServiceTest`
 
+会话与消息：
+
+- 会话创建、列表、详情、删除，只能访问自己的会话
+- `POST /api/chat` 自动创建会话并持久化用户问题与 AI 回答
+- 回答的引用来源以 JSON 文本保存到 `messages.citations`
+- 新增 `V2` Flyway 迁移：`citations` 从 JSONB 改为 TEXT，便于 JPA 映射
+- `ChatService` 负责聊天编排，`RagService` 保持纯检索与流式生成
+- `SessionServiceTest`、`ChatServiceTest`
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -112,6 +121,12 @@ RAG 模块补充问题：
 20. SSE 的 `start/delta/done/error` 事件分别解决了什么问题？
 21. 如果文档没有 embedding，为什么不能被检索到？
 
+会话模块补充问题：
+
+22. 为什么 `ChatService` 要在 `doOnComplete` 里保存 assistant 消息？
+23. 为什么会话详情只允许本人访问？在哪一层做的校验？
+24. `citations` 为什么要改成 TEXT？JSONB 和 TEXT 各有什么取舍？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -119,14 +134,14 @@ RAG 模块补充问题：
 - Flyway 已执行 `V1__init_core_schema.sql`，8 张核心表创建成功
 - 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
 - 应用进程仍在后台运行，方便你直接验证
-- `mvn test` 通过：认证 8 个 + 知识库 7 个 + 文档模块 9 个 + AI/RAG 6 个，共 30 个测试全部通过
+- `mvn test` 通过：共 36 个测试全部通过（新增会话 4 个 + 聊天编排 2 个）
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 会话历史与消息持久化
-2. 管理后台与前端
-3. 评估集与部署
+1. 管理后台与前端
+2. 评估集与部署
+3. 性能与安全加固
 
 ## 如何 review
 
