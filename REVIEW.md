@@ -43,6 +43,16 @@
 - 文档状态：`UPLOADED -> PARSING -> READY / FAILED`
 - `DocumentServiceTest`、`TextChunkerTest`、`TikaTextExtractorTest`
 
+向量化与 RAG：
+
+- 文档解析完成后自动为每个切片生成 embedding
+- 切片向量写入 `chunks.embedding`（pgvector HNSW 索引）
+- 提问时先向量检索相似切片，再组装 Prompt
+- `POST /api/chat` 以 SSE 流式返回回答和引用来源
+- 相似度低于阈值时明确提示“未找到相关资料”
+- 使用 DashScope OpenAI 兼容接口；未配置 API Key 时应用可启动，但 AI 调用会失败
+- `EmbeddingServiceTest`、`RagServiceTest`
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -95,6 +105,13 @@
 16. 切片为什么要设置 overlap？overlap 太大会有什么问题？
 17. 当前文件存在本地磁盘，生产环境应该换成什么方案？
 
+RAG 模块补充问题：
+
+18. 为什么用 `embedding <=> CAST(... AS vector)` 做余弦距离检索？
+19. 为什么先过滤相似度阈值再交给大模型？
+20. SSE 的 `start/delta/done/error` 事件分别解决了什么问题？
+21. 如果文档没有 embedding，为什么不能被检索到？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -102,14 +119,14 @@
 - Flyway 已执行 `V1__init_core_schema.sql`，8 张核心表创建成功
 - 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
 - 应用进程仍在后台运行，方便你直接验证
-- `mvn test` 通过：认证 8 个 + 知识库 7 个 + 文档模块 9 个，共 24 个测试全部通过
+- `mvn test` 通过：认证 8 个 + 知识库 7 个 + 文档模块 9 个 + AI/RAG 6 个，共 30 个测试全部通过
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 向量化：为切片生成 embedding 并写入 pgvector
-2. RAG 检索与流式问答
-3. 管理后台与前端
+1. 会话历史与消息持久化
+2. 管理后台与前端
+3. 评估集与部署
 
 ## 如何 review
 

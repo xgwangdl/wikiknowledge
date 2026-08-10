@@ -4,12 +4,14 @@ import com.wikiknowledge.domain.Chunk;
 import com.wikiknowledge.domain.Document;
 import com.wikiknowledge.document.extract.DocumentTextExtractor;
 import com.wikiknowledge.document.storage.LocalFileStorage;
+import com.wikiknowledge.ai.VectorizationService;
 import com.wikiknowledge.repository.ChunkRepository;
 import com.wikiknowledge.repository.DocumentRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,17 +22,20 @@ public class DocumentParser {
     private final DocumentTextExtractor textExtractor;
     private final TextChunker textChunker;
     private final LocalFileStorage fileStorage;
+    private final VectorizationService vectorizationService;
 
     public DocumentParser(DocumentRepository documentRepository,
                           ChunkRepository chunkRepository,
                           DocumentTextExtractor textExtractor,
                           TextChunker textChunker,
-                          LocalFileStorage fileStorage) {
+                          LocalFileStorage fileStorage,
+                          VectorizationService vectorizationService) {
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
         this.textExtractor = textExtractor;
         this.textChunker = textChunker;
         this.fileStorage = fileStorage;
+        this.vectorizationService = vectorizationService;
     }
 
     @Async
@@ -52,6 +57,7 @@ public class DocumentParser {
             }
             List<String> chunks = textChunker.chunk(text);
             chunkRepository.deleteByDocumentId(document.getId());
+            List<com.wikiknowledge.domain.Chunk> savedChunks = new ArrayList<>();
             int seq = 0;
             for (String content : chunks) {
                 Chunk chunk = new Chunk();
@@ -60,8 +66,9 @@ public class DocumentParser {
                 chunk.setContent(content);
                 chunk.setSeqNo(seq++);
                 chunk.setTokenCount(Math.max(1, content.length() / 4));
-                chunkRepository.save(chunk);
+                savedChunks.add(chunkRepository.save(chunk));
             }
+            vectorizationService.vectorize(savedChunks);
             document.setChunkCount(chunks.size());
             document.setStatus("READY");
             document.setErrorMessage(null);
