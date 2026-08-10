@@ -31,6 +31,8 @@ app:
   admin:
     username: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD:admin123}
+  storage:
+    root: ${STORAGE_ROOT:./data}
 
 server:
   port: 8080

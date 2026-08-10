@@ -37,6 +37,7 @@ wikiknowledge/
 - [x] 本地 PostgreSQL/Redis + Flyway + 健康检查
 - [x] 登录认证（Spring Security + JWT + 刷新令牌）
 - [x] 知识库管理（创建/编辑/删除/列表 + 权限控制）
-- [ ] 文档解析与 RAG
+- [x] 文档上传与解析（Tika 文本提取 + 切片入库）
+- [ ] RAG 问答
 - [ ] 管理后台
 - [ ] 测试与部署

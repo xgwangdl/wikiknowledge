@@ -2,6 +2,7 @@
 .vscode/
 *.iml
 target/
+data/
 node_modules/
 dist/
 logs/

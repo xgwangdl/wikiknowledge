@@ -33,6 +33,16 @@
 - 删除知识库依赖数据库外键级联删除文档与切片
 - `KnowledgeBaseServiceTest` 单元测试
 
+文档上传与解析：
+
+- 支持 pdf/docx/md/txt，单文件 20MB 限制
+- SHA-256 文件指纹，同一知识库内自动去重
+- 本地文件存储，上传后异步解析
+- Apache Tika 自动识别格式并提取文本
+- 按段落 + 500 字符/50 字符重叠进行切片入库
+- 文档状态：`UPLOADED -> PARSING -> READY / FAILED`
+- `DocumentServiceTest`、`TextChunkerTest`、`TikaTextExtractorTest`
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -78,6 +88,13 @@
 12. `AccessDeniedException` 为什么能统一转成 403 JSON？
 13. 如果以后要支持“共享知识库”，现有 owner 模型要改哪里？
 
+文档模块补充问题：
+
+14. 为什么要用 SHA-256 做文件去重，而不是只比较文件名？
+15. `@Async` 异步解析时，为什么要把解析逻辑放到独立的 `DocumentParser` 中？
+16. 切片为什么要设置 overlap？overlap 太大会有什么问题？
+17. 当前文件存在本地磁盘，生产环境应该换成什么方案？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -85,14 +102,14 @@
 - Flyway 已执行 `V1__init_core_schema.sql`，8 张核心表创建成功
 - 应用已启动，`http://localhost:8080/actuator/health` 返回 `{"status":"UP"}`
 - 应用进程仍在后台运行，方便你直接验证
-- `mvn test` 通过：`AuthServiceTest` 6 个 + `JwtServiceTest` 2 个 + `KnowledgeBaseServiceTest` 7 个，共 15 个测试全部通过
+- `mvn test` 通过：认证 8 个 + 知识库 7 个 + 文档模块 9 个，共 24 个测试全部通过
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. 文档上传与解析
-2. 再实现文档切片与向量化
-3. 再实现 RAG 问答
+1. 向量化：为切片生成 embedding 并写入 pgvector
+2. RAG 检索与流式问答
+3. 管理后台与前端
 
 ## 如何 review
 
