@@ -198,11 +198,14 @@ RAG 模块补充问题：
 - `docker compose config` 校验通过，包含 4 个服务
 - `mvn test` 共 39 个测试全部通过（新增评估模块 3 个）
 - `mvn test` 共 44 个测试全部通过（新增安全加固 5 个）
+- 已补充完整 [README.md](README.md) 与 [INTERVIEW_PREP.md](INTERVIEW_PREP.md)
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. README 完善与面试准备材料
+1. 本机启动 Docker 后做完整联调
+2. 配置真实 AI_API_KEY，验证上传文档 -> 向量化 -> 问答全链路
+3. 按 INTERVIEW_PREP.md 做面试模拟
 
 ## 如何 review
 
