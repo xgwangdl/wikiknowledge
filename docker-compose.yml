@@ -25,6 +25,46 @@ services:
     volumes:
       - wikiknowledge-redisdata:/data
 
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wikiknowledge-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/wikiknowledge
+      DB_USERNAME: wikiknowledge
+      DB_PASSWORD: wikiknowledge
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      AI_API_KEY: ${AI_API_KEY:-dummy-key-not-configured}
+      AI_BASE_URL: ${AI_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      AI_CHAT_MODEL: ${AI_CHAT_MODEL:-qwen-plus}
+      AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-text-embedding-v3}
+      JWT_SECRET: ${JWT_SECRET:-wikiknowledge-dev-secret-key-change-me-2026-0123456789}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      STORAGE_ROOT: /app/data
+    ports:
+      - "8080:8080"
+    volumes:
+      - wikiknowledge-uploads:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: wikiknowledge-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8081:80"
+
 volumes:
   wikiknowledge-pgdata:
   wikiknowledge-redisdata:
+  wikiknowledge-uploads:

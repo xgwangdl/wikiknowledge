@@ -41,6 +41,7 @@ wikiknowledge/
 - [x] 向量化与 RAG 问答（pgvector 检索 + SSE 流式回答 + 引用来源）
 - [x] 会话历史与消息持久化
 - [x] 管理后台与前端（Vue 3 + Element Plus）
-- [ ] 部署、CI 与评估
+- [x] Docker Compose 部署与 GitHub Actions CI
+- [ ] 黄金评估集与评估报告
 - [ ] 管理后台
 - [ ] 测试与部署

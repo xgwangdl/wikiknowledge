@@ -71,6 +71,15 @@
 - Vite 开发代理 `/api -> localhost:8080`
 - `npm run build` 已通过，dev server 运行在 `http://localhost:5173`
 
+部署与 CI：
+
+- 后端多阶段 Dockerfile：Maven 构建 + JRE 运行
+- 前端 Dockerfile：Node 构建 + Nginx 静态托管
+- Nginx 将 `/api` 反代到 backend，SSE 关闭 buffering
+- `docker-compose.yml` 包含 postgres/redis/backend/frontend 四个服务
+- GitHub Actions：后端测试、前端构建、两个 Docker 镜像构建
+- `docker compose config` 校验通过
+
 ## 本轮关键技术决策
 
 1. 为什么选 Spring Boot 3.5.16 而不是 4.1.0？
@@ -142,6 +151,12 @@ RAG 模块补充问题：
 26. SSE 的 `start` 事件返回 `sessionId` 后，前端为什么要保存它？
 27. 为什么 Vite 要把 `/api` 代理到后端，而不是直接跨域请求？
 
+部署补充问题：
+
+28. 前端 Nginx 为什么必须关闭 `proxy_buffering`？
+29. 后端 Dockerfile 为什么要分两个阶段？
+30. CI 里为什么先跑测试再打 Docker 镜像？
+
 ## 验证结果
 
 - `mvn -DskipTests package` 已通过，可生成可执行 jar。
@@ -152,13 +167,14 @@ RAG 模块补充问题：
 - `mvn test` 通过：共 36 个测试全部通过（新增会话 4 个 + 聊天编排 2 个）
 - `npm install` + `npm run build` 通过
 - 前端 dev server：`http://localhost:5173`
+- `docker compose config` 校验通过，包含 4 个服务
 - 说明：本会话沙箱没有 Docker Desktop 管理员权限，认证接口的 HTTP 联调需要你在本机启动 Docker 后验证
 
 ## 下一轮计划
 
-1. Docker Compose 部署与 GitHub Actions CI
-2. 黄金评估集与评估报告
-3. 性能与安全加固
+1. 黄金评估集与评估报告
+2. 性能与安全加固
+3. README 与面试准备材料
 
 ## 如何 review
 
