@@ -5,9 +5,13 @@ import com.wikiknowledge.domain.Session;
 import java.time.OffsetDateTime;
 
 public record SessionResponse(
+        /** 会话 ID */
         Long id,
+        /** 会话使用的知识库 ID */
         Long knowledgeBaseId,
+        /** 会话标题 */
         String title,
+        /** 创建时间 */
         OffsetDateTime createdAt) {
 
     public static SessionResponse from(Session session) {
