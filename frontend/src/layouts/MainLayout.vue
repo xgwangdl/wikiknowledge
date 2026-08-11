@@ -5,6 +5,7 @@
       <el-menu router :default-active="$route.path">
         <el-menu-item index="/chat">AI 问答</el-menu-item>
         <el-menu-item index="/knowledge-bases">知识库管理</el-menu-item>
+        <el-menu-item index="/eval">评估中心</el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

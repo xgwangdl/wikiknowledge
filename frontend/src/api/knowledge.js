@@ -23,3 +23,7 @@ export const uploadDocument = (knowledgeBaseId, file) => {
 
 export const deleteDocument = (id) =>
   http.delete(`/documents/${id}`)
+
+export const getSuggestions = (knowledgeBaseId, query) =>
+  http.get(`/knowledge-bases/${knowledgeBaseId}/suggestions`, { params: { query } })
+    .then((res) => res.data.questions || [])

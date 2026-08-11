@@ -8,4 +8,6 @@ import java.util.List;
 public interface EvalRunRepository extends JpaRepository<EvalRun, Long> {
 
     List<EvalRun> findByEvalSetIdOrderByCreatedAtDesc(Long evalSetId);
+
+    List<EvalRun> findAllByOrderByCreatedAtDesc();
 }

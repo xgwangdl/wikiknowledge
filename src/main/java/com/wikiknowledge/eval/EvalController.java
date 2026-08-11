@@ -8,6 +8,7 @@ import com.wikiknowledge.eval.dto.EvalSetResponse;
 import com.wikiknowledge.repository.EvalRunRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -28,13 +31,16 @@ public class EvalController {
     private final EvalSetService evalSetService;
     private final EvalRunner evalRunner;
     private final EvalRunRepository evalRunRepository;
+    private final EvalReportService evalReportService;
 
     public EvalController(EvalSetService evalSetService,
                           EvalRunner evalRunner,
-                          EvalRunRepository evalRunRepository) {
+                          EvalRunRepository evalRunRepository,
+                          EvalReportService evalReportService) {
         this.evalSetService = evalSetService;
         this.evalRunner = evalRunner;
         this.evalRunRepository = evalRunRepository;
+        this.evalReportService = evalReportService;
     }
 
     @GetMapping("/sets")
@@ -68,5 +74,32 @@ public class EvalController {
         return evalRunRepository.findById(id)
                 .map(run -> ResponseEntity.ok(EvalRunResponse.from(run)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/runs")
+    public ResponseEntity<List<EvalRunResponse>> listRuns(
+            @RequestParam(required = false) Long evalSetId) {
+        List<EvalRunResponse> runs = (evalSetId == null
+                ? evalRunRepository.findAllByOrderByCreatedAtDesc()
+                : evalRunRepository.findByEvalSetIdOrderByCreatedAtDesc(evalSetId))
+                .stream()
+                .map(EvalRunResponse::from)
+                .toList();
+        return ResponseEntity.ok(runs);
+    }
+
+    @GetMapping("/runs/{id}/export")
+    public ResponseEntity<String> exportRun(@PathVariable Long id) {
+        String csv = evalReportService.exportCsv(id);
+        return ResponseEntity.ok()
+                .contentType(new MediaType("text", "csv", StandardCharsets.UTF_8))
+                .header("Content-Disposition", "attachment; filename=eval-run-" + id + ".csv")
+                .body(csv);
+    }
+
+    @DeleteMapping("/runs/{id}")
+    public ResponseEntity<Void> deleteRun(@PathVariable Long id) {
+        evalRunRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

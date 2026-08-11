@@ -8,6 +8,17 @@
         <el-button type="primary" @click="handleNewSession">新会话</el-button>
       </div>
 
+      <div v-if="suggestions.length" class="suggestions">
+        <el-tag
+          v-for="suggestion in suggestions"
+          :key="suggestion"
+          class="suggestion"
+          @click="input = suggestion"
+        >
+          {{ suggestion }}
+        </el-tag>
+      </div>
+
       <div class="chat-body">
         <div class="session-list">
           <div
@@ -49,7 +60,7 @@
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listKnowledgeBases } from '../api/knowledge'
+import { getSuggestions, listKnowledgeBases } from '../api/knowledge'
 import { deleteSession, getSession, listSessions, streamChat } from '../api/chat'
 
 const knowledgeBases = ref([])
@@ -60,15 +71,26 @@ const messages = ref([])
 const input = ref('')
 const sending = ref(false)
 const messageArea = ref(null)
+const suggestions = ref([])
 
 onMounted(async () => {
   knowledgeBases.value = await listKnowledgeBases()
   sessions.value = await listSessions()
+  await loadSuggestions()
 })
 
-function handleKbChange() {
+async function handleKbChange() {
   activeSessionId.value = null
   messages.value = []
+  await loadSuggestions()
+}
+
+async function loadSuggestions() {
+  if (!activeKbId.value) {
+    suggestions.value = []
+    return
+  }
+  suggestions.value = await getSuggestions(activeKbId.value, '')
 }
 
 async function handleNewSession() {
@@ -234,5 +256,16 @@ async function scrollToBottom() {
   display: flex;
   gap: 12px;
   align-items: flex-end;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.suggestion {
+  cursor: pointer;
 }
 </style>

@@ -12,6 +12,8 @@ public interface ChunkRepository extends JpaRepository<Chunk, Long> {
 
     void deleteByDocumentId(Long documentId);
 
+    List<Chunk> findTop3ByKnowledgeBaseIdOrderByIdAsc(Long knowledgeBaseId);
+
     @Modifying
     @Query(value = "UPDATE chunks SET embedding = CAST(:embedding AS vector) WHERE id = :id", nativeQuery = true)
     void updateEmbedding(@Param("id") Long id, @Param("embedding") String embedding);

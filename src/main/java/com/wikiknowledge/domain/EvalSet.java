@@ -16,18 +16,23 @@ import java.time.OffsetDateTime;
 @Table(name = "eval_sets")
 @Getter
 @Setter
+/** 黄金评估集实体，对应 eval_sets 表。 */
 public class EvalSet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    /** 评估集主键 */
     private Long id;
 
     @Column(nullable = false, length = 100)
+    /** 评估集名称 */
     private String name;
 
+    /** 评估集描述 */
     private String description;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
+    /** 创建时间 */
     private OffsetDateTime createdAt;
 }

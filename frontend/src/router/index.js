@@ -11,7 +11,8 @@ const routes = [
     children: [
       { path: '', redirect: '/chat' },
       { path: 'chat', component: () => import('../views/ChatView.vue') },
-      { path: 'knowledge-bases', component: () => import('../views/KnowledgeBasesView.vue') }
+      { path: 'knowledge-bases', component: () => import('../views/KnowledgeBasesView.vue') },
+      { path: 'eval', component: () => import('../views/EvalView.vue') }
     ]
   }
 ]

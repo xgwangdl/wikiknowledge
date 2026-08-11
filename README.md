@@ -9,11 +9,13 @@
 - 文档上传与解析：支持 PDF / DOCX / Markdown / TXT，Tika 自动提取文本
 - 切片与向量化：段落级切片，embedding 写入 pgvector
 - RAG 问答：向量检索 + 大模型生成，SSE 流式输出，返回引用来源
+- 问题建议：根据知识库内容推荐用户可能想问的问题
 - 会话与消息：多轮会话历史持久化
 - 账号与权限：JWT 登录、刷新令牌、管理员权限
 - 管理后台：Vue 3 页面管理知识库、文档和问答
 - 安全与运维：Redis 限流、提示注入防护、traceId 日志链路
 - 评估体系：黄金评估集，计算 Recall@k / Precision@k / MRR
+- 评估中心：管理评估集、运行评估、导出 CSV 报告
 - 部署与 CI：Docker Compose 一键启动，GitHub Actions 自动测试构建
 
 ## 技术栈
@@ -125,6 +127,8 @@ GET    /api/sessions/{id}
 DELETE /api/sessions/{id}
 
 POST /api/chat   # SSE
+
+GET  /api/knowledge-bases/{id}/suggestions
 ```
 
 ### 评估（管理员）
@@ -134,6 +138,8 @@ POST /api/admin/evals/sets
 GET  /api/admin/evals/sets
 POST /api/admin/evals/runs
 GET  /api/admin/evals/runs/{id}
+GET  /api/admin/evals/runs
+GET  /api/admin/evals/runs/{id}/export
 ```
 
 ## 项目结构
