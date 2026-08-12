@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
+/** 创建评估集请求 DTO */
 public record EvalSetCreateRequest(
         /** 评估集名称 */
         @NotBlank @Size(max = 100) String name,

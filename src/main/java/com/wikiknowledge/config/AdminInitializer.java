@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component;/** 管理员种子账号初始化器 */
+
 
 @Component
 public class AdminInitializer implements CommandLineRunner {
@@ -29,6 +30,9 @@ public class AdminInitializer implements CommandLineRunner {
         this.adminPassword = adminPassword;
     }
 
+    /**
+     * 应用启动时创建管理员账号，账号已存在则跳过。
+     */
     @Override
     public void run(String... args) {
         if (userRepository.existsByUsername(adminUsername)) {

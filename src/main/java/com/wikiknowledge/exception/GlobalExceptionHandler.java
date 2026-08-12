@@ -9,7 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.RestControllerAdvice;/** 全局异常处理，统一返回 ApiError */
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

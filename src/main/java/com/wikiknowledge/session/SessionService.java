@@ -15,7 +15,8 @@ import com.wikiknowledge.session.dto.SessionResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.List;/** 会话业务逻辑 */
+
 
 @Service
 public class SessionService {
@@ -69,6 +70,9 @@ public class SessionService {
         sessionRepository.delete(getOwnedSession(id, username));
     }
 
+    /**
+     * 查找当前用户自己的会话；越权访问统一返回“会话不存在”。
+     */
     @Transactional(readOnly = true)
     public Session getOwnedSession(Long id, String username) {
         User user = findUser(username);

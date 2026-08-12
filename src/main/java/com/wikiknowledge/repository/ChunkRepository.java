@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/** 切片仓储，包含向量更新与相似检索 */
 public interface ChunkRepository extends JpaRepository<Chunk, Long> {
 
     void deleteByDocumentId(Long documentId);

@@ -3,7 +3,8 @@ package com.wikiknowledge.ai;
 import com.wikiknowledge.exception.BusinessException;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;/** 文本向量化服务，封装 EmbeddingModel */
+
 
 @Service
 public class EmbeddingService {

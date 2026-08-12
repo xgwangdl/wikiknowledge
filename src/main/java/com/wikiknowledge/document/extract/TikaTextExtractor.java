@@ -7,7 +7,8 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
+import java.io.InputStream;/** 基于 Apache Tika 的文本提取实现 */
+
 
 @Service
 public class TikaTextExtractor implements DocumentTextExtractor {

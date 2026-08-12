@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestController;/** 认证相关接口：注册、登录、刷新令牌、当前用户 */
+
 
 @RestController
 @RequestMapping("/api/auth")

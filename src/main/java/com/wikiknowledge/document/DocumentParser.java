@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List;/** 文档异步解析、切片与向量化 */
+
 
 @Service
 public class DocumentParser {
@@ -38,15 +39,21 @@ public class DocumentParser {
         this.vectorizationService = vectorizationService;
     }
 
+    /**
+     * 异步解析文档：提取文本 -> 切片 -> 向量化 -> 更新文档状态。
+     * 任一步骤失败都会把文档标记为 FAILED。
+     */
     @Async
     public void parseAsync(Long documentId) {
         Document document = documentRepository.findById(documentId).orElse(null);
         if (document == null) {
             return;
         }
+        // 1. 先更新为解析中状态
         document.setStatus("PARSING");
         documentRepository.save(document);
         try {
+            // 2. 读取本地文件并提取文本
             String text;
             try (InputStream inputStream = fileStorage.read(document.getId(), document.getFilename())) {
                 text = textExtractor.extract(inputStream, document.getFilename());
@@ -55,6 +62,7 @@ public class DocumentParser {
                 fail(document, "文档内容为空，无法解析");
                 return;
             }
+            // 3. 切片并入库
             List<String> chunks = textChunker.chunk(text);
             chunkRepository.deleteByDocumentId(document.getId());
             List<com.wikiknowledge.domain.Chunk> savedChunks = new ArrayList<>();
@@ -68,7 +76,9 @@ public class DocumentParser {
                 chunk.setTokenCount(Math.max(1, content.length() / 4));
                 savedChunks.add(chunkRepository.save(chunk));
             }
+            // 4. 为每个切片生成向量
             vectorizationService.vectorize(savedChunks);
+            // 5. 更新文档为 READY
             document.setChunkCount(chunks.size());
             document.setStatus("READY");
             document.setErrorMessage(null);

@@ -5,7 +5,8 @@ import com.wikiknowledge.repository.ChunkRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.List;/** 切片向量入库服务 */
+
 
 @Service
 public class VectorizationService {

@@ -4,6 +4,7 @@ import com.wikiknowledge.domain.EvalSet;
 
 import java.time.OffsetDateTime;
 
+/** 评估集响应 DTO */
 public record EvalSetResponse(
         /** 评估集 ID */
         Long id,

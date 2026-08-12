@@ -13,7 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.UUID;
+import java.util.UUID;/** JWT 生成与解析服务 */
+
 
 @Service
 public class JwtService {
@@ -42,6 +43,9 @@ public class JwtService {
         return refreshTtl;
     }
 
+    /**
+     * 解析并校验 JWT，返回 Claims；无效令牌抛出 JwtException。
+     */
     public Claims parseToken(String token) {
         try {
             return Jwts.parser()
@@ -54,6 +58,9 @@ public class JwtService {
         }
     }
 
+    /**
+     * 按用户信息和有效期生成签名 Token，包含角色与用户 ID。
+     */
     private String generateToken(User user, Duration ttl) {
         Instant now = Instant.now();
         return Jwts.builder()

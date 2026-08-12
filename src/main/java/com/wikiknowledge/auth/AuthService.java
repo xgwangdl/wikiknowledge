@@ -11,7 +11,8 @@ import com.wikiknowledge.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;/** 认证业务逻辑：注册、登录、刷新令牌、登出 */
+
 
 @Service
 public class AuthService {
@@ -31,6 +32,9 @@ public class AuthService {
         this.refreshTokenStore = refreshTokenStore;
     }
 
+    /**
+     * 注册新用户：校验用户名唯一，密码使用 BCrypt 加密后落库。
+     */
     @Transactional
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
@@ -43,6 +47,9 @@ public class AuthService {
         return UserResponse.from(userRepository.save(user));
     }
 
+    /**
+     * 登录：校验密码，成功后签发 Access/Refresh Token。
+     */
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         User user = findActiveUser(request.username());
@@ -52,6 +59,9 @@ public class AuthService {
         return issueTokens(user);
     }
 
+    /**
+     * 刷新令牌：校验 Redis 中的 Refresh Token，成功后轮换新令牌。
+     */
     @Transactional
     public AuthResponse refresh(RefreshRequest request) {
         Claims claims = jwtService.parseToken(request.refreshToken());
@@ -83,6 +93,9 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * 为用户签发 Access/Refresh Token，并将 Refresh Token 存入 Redis。
+     */
     private AuthResponse issueTokens(User user) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);

@@ -12,7 +12,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.List;/** 知识库业务逻辑与权限控制 */
+
 
 @Service
 public class KnowledgeBaseService {
@@ -69,6 +70,9 @@ public class KnowledgeBaseService {
                 .orElseThrow(() -> new BusinessException("KNOWLEDGE_BASE_NOT_FOUND", "知识库不存在"));
     }
 
+    /**
+     * 权限校验：只有知识库创建者或管理员可以操作。
+     */
     private void requireOwnerOrAdmin(KnowledgeBase knowledgeBase, String username) {
         User user = findUser(username);
         boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());

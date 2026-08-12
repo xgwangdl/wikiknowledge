@@ -3,7 +3,8 @@ package com.wikiknowledge.document;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List;/** 文本切片器 */
+
 
 @Component
 public class TextChunker {
@@ -11,6 +12,9 @@ public class TextChunker {
     public static final int CHUNK_SIZE = 500;
     public static final int OVERLAP = 50;
 
+    /**
+     * 文本切片：先按空行分段落，段落过长再按固定长度切片并保留重叠。
+     */
     public List<String> chunk(String text) {
         List<String> result = new ArrayList<>();
         String normalized = text.replace("\r\n", "\n");

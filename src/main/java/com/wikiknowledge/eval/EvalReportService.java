@@ -11,7 +11,8 @@ import com.wikiknowledge.repository.EvalResultRepository;
 import com.wikiknowledge.repository.EvalRunRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.List;/** 评估报告 CSV 导出服务 */
+
 
 @Service
 public class EvalReportService {
@@ -31,11 +32,15 @@ public class EvalReportService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * 导出评估运行报告为 CSV，包含每题指标与聚合指标。
+     */
     public String exportCsv(Long runId) {
         EvalRun run = evalRunRepository.findById(runId)
                 .orElseThrow(() -> new BusinessException("EVAL_RUN_NOT_FOUND", "评估运行不存在"));
         List<EvalResult> results = evalResultRepository.findByEvalRunIdOrderByIdAsc(runId);
 
+        // 添加 BOM，避免 Excel 打开中文乱码
         StringBuilder csv = new StringBuilder("\uFEFF");
         csv.append("questionId,question,expectedAnswer,expectedChunkIds,retrievedChunkIds,recall,precision,mrr\n");
 
@@ -69,6 +74,9 @@ public class EvalReportService {
         }
     }
 
+    /**
+     * CSV 转义：包含逗号、引号或换行时用引号包裹并双写引号。
+     */
     private String escape(Object value) {
         String text = value == null ? "" : String.valueOf(value);
         if (text.contains(",") || text.contains("\"") || text.contains("\n")) {

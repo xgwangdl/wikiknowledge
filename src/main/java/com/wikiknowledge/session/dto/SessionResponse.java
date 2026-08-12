@@ -4,6 +4,7 @@ import com.wikiknowledge.domain.Session;
 
 import java.time.OffsetDateTime;
 
+/** 会话响应 DTO */
 public record SessionResponse(
         /** 会话 ID */
         Long id,

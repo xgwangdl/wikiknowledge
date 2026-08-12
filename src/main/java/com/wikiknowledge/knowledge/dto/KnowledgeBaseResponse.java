@@ -4,6 +4,7 @@ import com.wikiknowledge.domain.KnowledgeBase;
 
 import java.time.OffsetDateTime;
 
+/** 知识库响应 DTO */
 public record KnowledgeBaseResponse(
         /** 知识库 ID */
         Long id,

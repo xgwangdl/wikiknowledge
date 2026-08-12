@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.List;/** JWT 请求鉴权过滤器 */
+
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -28,6 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
+    /**
+     * 解析 Authorization 头中的 Bearer Token，校验通过后写入 SecurityContext。
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

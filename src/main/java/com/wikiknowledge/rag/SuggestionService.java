@@ -17,7 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List;/** 问题建议生成服务 */
+
 
 @Service
 public class SuggestionService {
@@ -46,10 +47,14 @@ public class SuggestionService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * 生成问题建议：先查 Redis 缓存，未命中则基于知识库内容生成并缓存。
+     */
     public List<String> suggest(Long knowledgeBaseId, String query) {
         knowledgeBaseRepository.findById(knowledgeBaseId)
                 .orElseThrow(() -> new BusinessException("KNOWLEDGE_BASE_NOT_FOUND", "知识库不存在"));
 
+        // 1. 尝试读取缓存
         String cacheKey = CACHE_PREFIX + knowledgeBaseId + ":" + (query == null ? "" : query);
         String cached = redisTemplate.opsForValue().get(cacheKey);
         if (cached != null) {
@@ -61,6 +66,7 @@ public class SuggestionService {
             }
         }
 
+        // 2. 未命中缓存时生成建议并写入缓存
         List<String> suggestions = buildSuggestions(knowledgeBaseId, query);
         try {
             redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(suggestions), CACHE_TTL);
@@ -70,6 +76,9 @@ public class SuggestionService {
         return suggestions;
     }
 
+    /**
+     * 生成建议：优先使用 LLM，AI 不可用时回退为基于切片内容的模板问题。
+     */
     private List<String> buildSuggestions(Long knowledgeBaseId, String query) {
         List<String> contents = loadChunkContents(knowledgeBaseId, query);
         if (contents.isEmpty()) {
@@ -98,6 +107,9 @@ public class SuggestionService {
         return fallbackSuggestions(contents);
     }
 
+    /**
+     * 加载用于生成建议的知识库片段；有查询词时走向量检索，否则取前 3 个切片。
+     */
     private List<String> loadChunkContents(Long knowledgeBaseId, String query) {
         if (query == null || query.isBlank()) {
             return chunkRepository.findTop3ByKnowledgeBaseIdOrderByIdAsc(knowledgeBaseId).stream()

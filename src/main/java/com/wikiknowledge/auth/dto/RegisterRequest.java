@@ -3,6 +3,7 @@ package com.wikiknowledge.auth.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** 注册请求 DTO */
 public record RegisterRequest(
         /** 注册用户名，3-50 个字符 */
         @NotBlank @Size(min = 3, max = 50) String username,

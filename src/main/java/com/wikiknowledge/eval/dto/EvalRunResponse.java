@@ -4,6 +4,7 @@ import com.wikiknowledge.domain.EvalRun;
 
 import java.time.OffsetDateTime;
 
+/** 评估运行响应 DTO */
 public record EvalRunResponse(
         /** 评估运行 ID */
         Long id,

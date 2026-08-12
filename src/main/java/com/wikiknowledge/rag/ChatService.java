@@ -14,7 +14,8 @@ import reactor.core.publisher.Flux;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReference;/** 聊天编排服务：建会话、持久化消息、转发 SSE */
+
 
 @Service
 public class ChatService {
@@ -37,6 +38,9 @@ public class ChatService {
         this.promptGuardService = promptGuardService;
     }
 
+    /**
+     * 编排一次聊天：创建或复用会话，持久化用户消息，流式转发 AI 回答并保存。
+     */
     public Flux<ServerSentEvent<RagEvent>> chat(ChatRequest request, String username) {
         promptGuardService.validate(request.question());
         Session session;
@@ -64,6 +68,9 @@ public class ChatService {
                 .map(serverEvent -> decorateStart(serverEvent, session.getId()));
     }
 
+    /**
+     * 从 SSE 事件中累积回答文本与引用来源。
+     */
     private void collect(RagEvent event,
                          AtomicReference<StringBuilder> answerRef,
                          AtomicReference<String> citationsRef) {
@@ -91,6 +98,9 @@ public class ChatService {
         }
     }
 
+    /**
+     * 在 start 事件中补充 sessionId，便于前端保存会话。
+     */
     private ServerSentEvent<RagEvent> decorateStart(ServerSentEvent<RagEvent> serverEvent, Long sessionId) {
         RagEvent event = serverEvent.data();
         if (event == null || !"start".equals(event.type()) || !(event.data() instanceof Map<?, ?>)) {

@@ -17,7 +17,8 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Map;/** RAG 检索与流式生成服务 */
+
 
 @Service
 public class RagService {
@@ -40,11 +41,18 @@ public class RagService {
         this.chatModelProvider = chatModelProvider;
     }
 
+    /**
+     * 执行 RAG 问答：向量化问题 -> 检索相似切片 -> 组装 Prompt -> 流式回答。
+     * 无相关上下文或 AI 未配置时返回 error 事件。
+     */
     public Flux<ServerSentEvent<RagEvent>> chat(ChatRequest request) {
+        // 1. 校验知识库是否存在
         KnowledgeBase knowledgeBase = knowledgeBaseRepository.findById(request.knowledgeBaseId())
                 .orElseThrow(() -> new BusinessException("KNOWLEDGE_BASE_NOT_FOUND", "知识库不存在"));
 
+        // 2. 将用户问题向量化
         float[] queryVector = embeddingService.embed(request.question());
+        // 3. 检索相似切片，并过滤相似度过低的结果
         List<ChunkMatch> matches = chunkRepository.searchSimilar(
                         knowledgeBase.getId(),
                         embeddingService.toVectorLiteral(queryVector),
@@ -68,6 +76,7 @@ public class RagService {
             )));
         }
 
+        // 4. 组装 Prompt 后流式调用大模型
         String prompt = buildPrompt(matches, request.question());
         Flux<ChatResponse> responses = chatModel.stream(new Prompt(prompt));
         List<Map<String, Object>> citations = buildCitations(matches);
@@ -91,6 +100,9 @@ public class RagService {
         );
     }
 
+    /**
+     * 组装 RAG Prompt，约束模型只依据知识库资料回答。
+     */
     private String buildPrompt(List<ChunkMatch> matches, String question) {
         StringBuilder sb = new StringBuilder("以下是知识库中的相关资料：\n\n");
         int index = 1;
@@ -103,6 +115,9 @@ public class RagService {
         return sb.toString();
     }
 
+    /**
+     * 将命中的切片转换为引用来源列表。
+     */
     private List<Map<String, Object>> buildCitations(List<ChunkMatch> matches) {
         List<Map<String, Object>> citations = new ArrayList<>();
         for (ChunkMatch match : matches) {

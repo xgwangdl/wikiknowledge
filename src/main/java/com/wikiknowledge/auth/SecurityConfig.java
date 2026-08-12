@@ -12,7 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;/** Spring Security 配置：无状态 JWT 认证 */
+
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +25,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * 配置无状态 Security 过滤链，放行认证与健康检查接口。
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {

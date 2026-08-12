@@ -5,7 +5,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDate;
+import java.time.LocalDate;/** Redis 限流服务：每分钟与每日计数限流 */
+
 
 @Service
 public class RateLimitService {
@@ -25,7 +26,11 @@ public class RateLimitService {
         this.perDay = perDay;
     }
 
+    /**
+     * 校验限流：先检查每分钟次数，再检查每天次数，超过阈值抛出限流异常。
+     */
     public void check(String username, String ip) {
+        // 1. 分钟级限流
         String minuteKey = MINUTE_PREFIX + username + ":" + ip + ":" + minuteBucket();
         Long minuteCount = redisTemplate.opsForValue().increment(minuteKey);
         if (minuteCount != null && minuteCount == 1L) {
@@ -35,6 +40,7 @@ public class RateLimitService {
             throw new RateLimitException("请求过于频繁，请稍后再试");
         }
 
+        // 2. 天级限流
         String dayKey = DAY_PREFIX + username + ":" + ip + ":" + LocalDate.now();
         Long dayCount = redisTemplate.opsForValue().increment(dayKey);
         if (dayCount != null && dayCount == 1L) {

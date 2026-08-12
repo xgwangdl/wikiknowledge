@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+/** 文档仓储 */
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     List<Document> findByKnowledgeBaseIdOrderByCreatedAtDesc(Long knowledgeBaseId);

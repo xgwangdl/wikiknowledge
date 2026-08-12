@@ -4,6 +4,7 @@ import com.wikiknowledge.domain.Document;
 
 import java.time.OffsetDateTime;
 
+/** 文档响应 DTO */
 public record DocumentResponse(
         /** 文档 ID */
         Long id,

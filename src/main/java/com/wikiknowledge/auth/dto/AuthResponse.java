@@ -1,5 +1,6 @@
 package com.wikiknowledge.auth.dto;
 
+/** 登录/刷新成功响应 DTO */
 public record AuthResponse(
         /** 短期 Access Token，用于接口鉴权 */
         String accessToken,

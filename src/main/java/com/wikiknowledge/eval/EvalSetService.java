@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors;/** 评估集管理业务逻辑 */
+
 
 @Service
 public class EvalSetService {
@@ -28,6 +29,9 @@ public class EvalSetService {
         this.evalQuestionRepository = evalQuestionRepository;
     }
 
+    /**
+     * 创建评估集并批量保存评估题目。
+     */
     @Transactional
     public EvalSetResponse create(EvalSetCreateRequest request) {
         EvalSet evalSet = new EvalSet();

@@ -2,6 +2,7 @@ package com.wikiknowledge.auth.dto;
 
 import com.wikiknowledge.domain.User;
 
+/** 用户信息响应 DTO */
 public record UserResponse(
         /** 用户 ID */
         Long id,

@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.Paths;/** 本地文件存储 */
+
 
 @Service
 public class LocalFileStorage {
@@ -20,6 +21,9 @@ public class LocalFileStorage {
         Files.createDirectories(this.root);
     }
 
+    /**
+     * 将上传文件保存到本地目录，路径按文档 ID 隔离。
+     */
     public Path save(Long documentId, String filename, MultipartFile file) throws IOException {
         Path directory = root.resolve(String.valueOf(documentId));
         Files.createDirectories(directory);

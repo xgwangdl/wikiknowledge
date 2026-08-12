@@ -7,7 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;/** 全局限流拦截器 */
+
 
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
@@ -18,6 +19,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         this.rateLimitService = rateLimitService;
     }
 
+    /**
+     * 请求进入 Controller 前执行限流校验，命中限流时直接返回 429。
+     */
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,

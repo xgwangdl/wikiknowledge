@@ -3,7 +3,8 @@ package com.wikiknowledge.auth;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.time.Duration;/** 刷新令牌 Redis 存储与校验 */
+
 
 @Service
 public class RefreshTokenStore {

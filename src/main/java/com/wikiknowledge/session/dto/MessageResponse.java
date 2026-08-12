@@ -4,6 +4,7 @@ import com.wikiknowledge.domain.Message;
 
 import java.time.OffsetDateTime;
 
+/** 消息响应 DTO */
 public record MessageResponse(
         /** 消息 ID */
         Long id,

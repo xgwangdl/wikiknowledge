@@ -22,7 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors;/** 评估执行器：计算 Recall/Precision/MRR */
+
 
 @Service
 public class EvalRunner {
@@ -48,13 +49,18 @@ public class EvalRunner {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * 执行评估：逐题向量检索，计算 Recall/Precision/MRR，最后写聚合指标。
+     */
     @Transactional
     public EvalRun run(EvalRunRequest request) {
+        // 1. 加载评估题目
         List<EvalQuestion> questions = evalQuestionRepository.findByEvalSetIdOrderByIdAsc(request.evalSetId());
         if (questions.isEmpty()) {
             throw new BusinessException("EMPTY_EVAL_SET", "评估集没有题目");
         }
 
+        // 2. 创建运行记录
         EvalRun evalRun = new EvalRun();
         evalRun.setEvalSetId(request.evalSetId());
         evalRun.setStatus("RUNNING");
@@ -65,6 +71,7 @@ public class EvalRunner {
         List<Double> mrrs = new ArrayList<>();
 
         try {
+            // 3. 逐题检索并计算指标
             for (EvalQuestion question : questions) {
                 float[] vector = embeddingService.embed(question.getQuestion());
                 List<ChunkMatch> retrieved = chunkRepository.searchSimilar(
@@ -98,6 +105,7 @@ public class EvalRunner {
                 evalResultRepository.save(result);
             }
 
+            // 4. 计算聚合指标
             Map<String, Object> metrics = Map.of(
                     "questionCount", questions.size(),
                     "avgRecall", average(recalls),
@@ -113,6 +121,9 @@ public class EvalRunner {
         return evalRunRepository.save(evalRun);
     }
 
+    /**
+     * 解析期望命中的 chunk id 字符串为集合。
+     */
     private Set<Long> parseExpected(String csv) {
         if (csv == null || csv.isBlank()) {
             return Set.of();
@@ -127,6 +138,9 @@ public class EvalRunner {
         return ids;
     }
 
+    /**
+     * 计算 MRR：第一个命中结果的倒数排名。
+     */
     private double computeMrr(List<ChunkMatch> retrieved, Set<Long> expected) {
         if (expected.isEmpty()) {
             return 0.0;

@@ -3,6 +3,7 @@ package com.wikiknowledge.eval.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+/** 评估运行请求 DTO */
 public record EvalRunRequest(
         /** 评估集 ID */
         @NotNull Long evalSetId,
