@@ -27,6 +27,11 @@ public class SecurityConfig {
 
     /**
      * 配置无状态 Security 过滤链，放行认证与健康检查接口。
+     *
+     * @param http                   HttpSecurity 配置
+     * @param jwtAuthenticationFilter JWT 鉴权过滤器
+     * @return 配置完成的 Security 过滤链
+     * @throws Exception 安全配置异常
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,

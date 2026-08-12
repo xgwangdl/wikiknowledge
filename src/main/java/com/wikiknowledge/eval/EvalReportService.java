@@ -34,6 +34,9 @@ public class EvalReportService {
 
     /**
      * 导出评估运行报告为 CSV，包含每题指标与聚合指标。
+     *
+     * @param runId 评估运行 ID
+     * @return CSV 文本内容
      */
     public String exportCsv(Long runId) {
         EvalRun run = evalRunRepository.findById(runId)
@@ -76,6 +79,9 @@ public class EvalReportService {
 
     /**
      * CSV 转义：包含逗号、引号或换行时用引号包裹并双写引号。
+     *
+     * @param value 原始字段值
+     * @return 转义后的 CSV 字段
      */
     private String escape(Object value) {
         String text = value == null ? "" : String.valueOf(value);

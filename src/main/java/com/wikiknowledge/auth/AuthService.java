@@ -34,6 +34,9 @@ public class AuthService {
 
     /**
      * 注册新用户：校验用户名唯一，密码使用 BCrypt 加密后落库。
+     *
+     * @param request 注册请求
+     * @return 注册成功的用户信息
      */
     @Transactional
     public UserResponse register(RegisterRequest request) {
@@ -49,6 +52,9 @@ public class AuthService {
 
     /**
      * 登录：校验密码，成功后签发 Access/Refresh Token。
+     *
+     * @param request 登录请求
+     * @return Access/Refresh Token 与用户信息
      */
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
@@ -61,6 +67,9 @@ public class AuthService {
 
     /**
      * 刷新令牌：校验 Redis 中的 Refresh Token，成功后轮换新令牌。
+     *
+     * @param request 刷新令牌请求
+     * @return 新的 Access/Refresh Token 与用户信息
      */
     @Transactional
     public AuthResponse refresh(RefreshRequest request) {
@@ -95,6 +104,9 @@ public class AuthService {
 
     /**
      * 为用户签发 Access/Refresh Token，并将 Refresh Token 存入 Redis。
+     *
+     * @param user 当前用户
+     * @return 认证响应
      */
     private AuthResponse issueTokens(User user) {
         String accessToken = jwtService.generateAccessToken(user);

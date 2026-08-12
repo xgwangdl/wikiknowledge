@@ -21,6 +21,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     /**
      * 请求进入 Controller 前执行限流校验，命中限流时直接返回 429。
+     *
+     * @param request HTTP 请求
+     * @param response HTTP 响应
+     * @param handler 目标处理器
+     * @return true 表示放行，false 表示已返回限流响应
+     * @throws Exception 拦截器异常
      */
     @Override
     public boolean preHandle(HttpServletRequest request,

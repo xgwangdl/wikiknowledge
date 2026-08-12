@@ -28,6 +28,9 @@ public class RateLimitService {
 
     /**
      * 校验限流：先检查每分钟次数，再检查每天次数，超过阈值抛出限流异常。
+     *
+     * @param username 当前用户
+     * @param ip       请求 IP
      */
     public void check(String username, String ip) {
         // 1. 分钟级限流

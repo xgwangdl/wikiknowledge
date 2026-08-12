@@ -72,6 +72,9 @@ public class KnowledgeBaseService {
 
     /**
      * 权限校验：只有知识库创建者或管理员可以操作。
+     *
+     * @param knowledgeBase 目标知识库
+     * @param username      当前登录用户名
      */
     private void requireOwnerOrAdmin(KnowledgeBase knowledgeBase, String username) {
         User user = findUser(username);

@@ -49,6 +49,10 @@ public class SuggestionService {
 
     /**
      * 生成问题建议：先查 Redis 缓存，未命中则基于知识库内容生成并缓存。
+     *
+     * @param knowledgeBaseId 知识库 ID
+     * @param query           可选查询词，用于针对性建议
+     * @return 推荐问题列表
      */
     public List<String> suggest(Long knowledgeBaseId, String query) {
         knowledgeBaseRepository.findById(knowledgeBaseId)
@@ -78,6 +82,10 @@ public class SuggestionService {
 
     /**
      * 生成建议：优先使用 LLM，AI 不可用时回退为基于切片内容的模板问题。
+     *
+     * @param knowledgeBaseId 知识库 ID
+     * @param query           可选查询词
+     * @return 推荐问题列表
      */
     private List<String> buildSuggestions(Long knowledgeBaseId, String query) {
         List<String> contents = loadChunkContents(knowledgeBaseId, query);
@@ -109,6 +117,10 @@ public class SuggestionService {
 
     /**
      * 加载用于生成建议的知识库片段；有查询词时走向量检索，否则取前 3 个切片。
+     *
+     * @param knowledgeBaseId 知识库 ID
+     * @param query           可选查询词
+     * @return 切片内容列表
      */
     private List<String> loadChunkContents(Long knowledgeBaseId, String query) {
         if (query == null || query.isBlank()) {

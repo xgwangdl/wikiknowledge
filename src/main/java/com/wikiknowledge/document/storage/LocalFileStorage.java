@@ -23,6 +23,12 @@ public class LocalFileStorage {
 
     /**
      * 将上传文件保存到本地目录，路径按文档 ID 隔离。
+     *
+     * @param documentId 文档 ID
+     * @param filename   原始文件名
+     * @param file       上传文件
+     * @return 保存后的文件路径
+     * @throws IOException 文件写入失败
      */
     public Path save(Long documentId, String filename, MultipartFile file) throws IOException {
         Path directory = root.resolve(String.valueOf(documentId));

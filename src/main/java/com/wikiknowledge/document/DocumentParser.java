@@ -42,6 +42,8 @@ public class DocumentParser {
     /**
      * 异步解析文档：提取文本 -> 切片 -> 向量化 -> 更新文档状态。
      * 任一步骤失败都会把文档标记为 FAILED。
+     *
+     * @param documentId 要解析的文档 ID
      */
     @Async
     public void parseAsync(Long documentId) {

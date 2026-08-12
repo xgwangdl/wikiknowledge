@@ -44,6 +44,9 @@ public class RagService {
     /**
      * 执行 RAG 问答：向量化问题 -> 检索相似切片 -> 组装 Prompt -> 流式回答。
      * 无相关上下文或 AI 未配置时返回 error 事件。
+     *
+     * @param request 聊天请求，包含知识库 ID 和用户问题
+     * @return SSE 事件流，包含 start/delta/done/error 事件
      */
     public Flux<ServerSentEvent<RagEvent>> chat(ChatRequest request) {
         // 1. 校验知识库是否存在
@@ -102,6 +105,10 @@ public class RagService {
 
     /**
      * 组装 RAG Prompt，约束模型只依据知识库资料回答。
+     *
+     * @param matches  命中的知识库切片
+     * @param question 用户问题
+     * @return 组装后的 Prompt 文本
      */
     private String buildPrompt(List<ChunkMatch> matches, String question) {
         StringBuilder sb = new StringBuilder("以下是知识库中的相关资料：\n\n");
@@ -117,6 +124,9 @@ public class RagService {
 
     /**
      * 将命中的切片转换为引用来源列表。
+     *
+     * @param matches 命中的知识库切片
+     * @return 引用来源列表，包含 chunk/document/相似度信息
      */
     private List<Map<String, Object>> buildCitations(List<ChunkMatch> matches) {
         List<Map<String, Object>> citations = new ArrayList<>();

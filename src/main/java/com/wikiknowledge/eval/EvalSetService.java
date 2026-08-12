@@ -31,6 +31,9 @@ public class EvalSetService {
 
     /**
      * 创建评估集并批量保存评估题目。
+     *
+     * @param request 创建评估集请求
+     * @return 创建后的评估集信息
      */
     @Transactional
     public EvalSetResponse create(EvalSetCreateRequest request) {

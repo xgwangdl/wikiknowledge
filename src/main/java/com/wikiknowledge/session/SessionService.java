@@ -72,6 +72,10 @@ public class SessionService {
 
     /**
      * 查找当前用户自己的会话；越权访问统一返回“会话不存在”。
+     *
+     * @param id       会话 ID
+     * @param username 当前登录用户名
+     * @return 当前用户拥有的会话
      */
     @Transactional(readOnly = true)
     public Session getOwnedSession(Long id, String username) {

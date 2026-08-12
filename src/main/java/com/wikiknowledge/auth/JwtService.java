@@ -45,6 +45,9 @@ public class JwtService {
 
     /**
      * 解析并校验 JWT，返回 Claims；无效令牌抛出 JwtException。
+     *
+     * @param token JWT 字符串
+     * @return 解析后的 Claims
      */
     public Claims parseToken(String token) {
         try {
@@ -60,6 +63,10 @@ public class JwtService {
 
     /**
      * 按用户信息和有效期生成签名 Token，包含角色与用户 ID。
+     *
+     * @param user 当前用户
+     * @param ttl  令牌有效期
+     * @return 签名后的 JWT 字符串
      */
     private String generateToken(User user, Duration ttl) {
         Instant now = Instant.now();

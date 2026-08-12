@@ -31,6 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * 解析 Authorization 头中的 Bearer Token，校验通过后写入 SecurityContext。
+     *
+     * @param request     HTTP 请求
+     * @param response    HTTP 响应
+     * @param filterChain 过滤器链
+     * @throws ServletException 过滤器异常
+     * @throws IOException      IO 异常
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request,

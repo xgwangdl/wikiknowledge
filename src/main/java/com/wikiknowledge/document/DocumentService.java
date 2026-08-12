@@ -49,6 +49,13 @@ public class DocumentService {
 
     /**
      * 上传文档：校验格式与大小 -> 去重 -> 落库 -> 保存文件 -> 触发异步解析。
+     *
+     * @param knowledgeBaseId 目标知识库 ID
+     * @param file            上传的文件
+     * @param username        当前登录用户名
+     * @return 上传成功的文档信息
+     * @throws IOException              文件保存失败
+     * @throws NoSuchAlgorithmException SHA-256 算法不可用
      */
     @Transactional
     public DocumentResponse upload(Long knowledgeBaseId, MultipartFile file, String username)
@@ -106,6 +113,10 @@ public class DocumentService {
 
     /**
      * 删除文档：先校验权限，再删除数据库记录和本地文件。
+     *
+     * @param id       文档 ID
+     * @param username 当前登录用户名
+     * @throws IOException 本地文件删除失败
      */
     @Transactional
     public void delete(Long id, String username) throws IOException {
@@ -124,6 +135,9 @@ public class DocumentService {
 
     /**
      * 权限校验：只有知识库创建者或管理员可以操作。
+     *
+     * @param knowledgeBase 目标知识库
+     * @param username      当前登录用户名
      */
     private void requireOwnerOrAdmin(KnowledgeBase knowledgeBase, String username) {
         User user = userRepository.findByUsername(username)
@@ -145,6 +159,10 @@ public class DocumentService {
 
     /**
      * 计算文件 SHA-256，作为内容指纹。
+     *
+     * @param bytes 文件内容字节
+     * @return 十六进制 SHA-256 摘要
+     * @throws NoSuchAlgorithmException SHA-256 算法不可用
      */
     private String sha256(byte[] bytes) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");

@@ -14,6 +14,9 @@ public class TextChunker {
 
     /**
      * 文本切片：先按空行分段落，段落过长再按固定长度切片并保留重叠。
+     *
+     * @param text 原始文本
+     * @return 切片列表
      */
     public List<String> chunk(String text) {
         List<String> result = new ArrayList<>();

@@ -51,6 +51,9 @@ public class EvalRunner {
 
     /**
      * 执行评估：逐题向量检索，计算 Recall/Precision/MRR，最后写聚合指标。
+     *
+     * @param request 评估运行请求，包含评估集、知识库与 topK
+     * @return 评估运行记录，含聚合指标或失败信息
      */
     @Transactional
     public EvalRun run(EvalRunRequest request) {
@@ -123,6 +126,9 @@ public class EvalRunner {
 
     /**
      * 解析期望命中的 chunk id 字符串为集合。
+     *
+     * @param csv 逗号分隔的 chunk id 字符串
+     * @return 期望命中 ID 集合
      */
     private Set<Long> parseExpected(String csv) {
         if (csv == null || csv.isBlank()) {
@@ -140,6 +146,10 @@ public class EvalRunner {
 
     /**
      * 计算 MRR：第一个命中结果的倒数排名。
+     *
+     * @param retrieved 检索返回的切片列表
+     * @param expected  期望命中的 ID 集合
+     * @return MRR 值，未命中时返回 0
      */
     private double computeMrr(List<ChunkMatch> retrieved, Set<Long> expected) {
         if (expected.isEmpty()) {

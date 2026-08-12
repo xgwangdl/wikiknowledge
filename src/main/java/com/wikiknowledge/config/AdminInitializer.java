@@ -32,6 +32,8 @@ public class AdminInitializer implements CommandLineRunner {
 
     /**
      * 应用启动时创建管理员账号，账号已存在则跳过。
+     *
+     * @param args 启动参数
      */
     @Override
     public void run(String... args) {

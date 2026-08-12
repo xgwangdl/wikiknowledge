@@ -19,6 +19,12 @@ public class TraceIdFilter extends OncePerRequestFilter {
 
     /**
      * 为每个请求生成或透传 traceId，并放入 MDC 供日志输出。
+     *
+     * @param request     HTTP 请求
+     * @param response    HTTP 响应
+     * @param filterChain 过滤器链
+     * @throws ServletException 过滤器异常
+     * @throws IOException      IO 异常
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request,

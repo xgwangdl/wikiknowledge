@@ -40,6 +40,10 @@ public class ChatService {
 
     /**
      * 编排一次聊天：创建或复用会话，持久化用户消息，流式转发 AI 回答并保存。
+     *
+     * @param request  聊天请求
+     * @param username 当前登录用户名
+     * @return SSE 事件流
      */
     public Flux<ServerSentEvent<RagEvent>> chat(ChatRequest request, String username) {
         promptGuardService.validate(request.question());
@@ -70,6 +74,10 @@ public class ChatService {
 
     /**
      * 从 SSE 事件中累积回答文本与引用来源。
+     *
+     * @param event        当前 SSE 事件
+     * @param answerRef    回答文本累积器
+     * @param citationsRef 引用来源 JSON 累积器
      */
     private void collect(RagEvent event,
                          AtomicReference<StringBuilder> answerRef,
@@ -100,6 +108,10 @@ public class ChatService {
 
     /**
      * 在 start 事件中补充 sessionId，便于前端保存会话。
+     *
+     * @param serverEvent 原始 SSE 事件
+     * @param sessionId   当前会话 ID
+     * @return 补充 sessionId 后的 SSE 事件
      */
     private ServerSentEvent<RagEvent> decorateStart(ServerSentEvent<RagEvent> serverEvent, Long sessionId) {
         RagEvent event = serverEvent.data();
