@@ -180,6 +180,7 @@ npm run build
 ## 文档
 
 - [REQUIREMENTS.md](REQUIREMENTS.md)：需求文档
+- [REQUIREMENTS_V2.md](REQUIREMENTS_V2.md)：V2.0 AI 教育助手需求文档
 - [REVIEW.md](REVIEW.md)：每轮学习与 review 指引
 - [INTERVIEW_PREP.md](INTERVIEW_PREP.md)：面试准备材料
 
