@@ -50,6 +50,7 @@
             placeholder="输入你的问题，Enter 发送"
             @keydown.enter.exact.prevent="handleSend"
           />
+          <el-button v-if="sending" type="danger" @click="handleStop">停止</el-button>
           <el-button type="primary" :loading="sending" @click="handleSend">发送</el-button>
         </div>
       </div>
@@ -72,6 +73,7 @@ const input = ref('')
 const sending = ref(false)
 const messageArea = ref(null)
 const suggestions = ref([])
+const abortController = ref(null)
 
 onMounted(async () => {
   knowledgeBases.value = await listKnowledgeBases()
@@ -137,6 +139,7 @@ async function handleSend() {
   messages.value.push(assistant)
   input.value = ''
   sending.value = true
+  abortController.value = new AbortController()
   await scrollToBottom()
 
   try {
@@ -145,6 +148,7 @@ async function handleSend() {
       question,
       sessionId: activeSessionId.value,
       title: activeSessionId.value ? null : '新会话',
+      signal: abortController.value.signal,
       onEvent: (event) => {
         if (event.type === 'start' && event.data?.sessionId) {
           activeSessionId.value = event.data.sessionId
@@ -159,13 +163,22 @@ async function handleSend() {
       }
     })
   } catch (error) {
-    assistant.content = '请求失败，请稍后重试'
-    ElMessage.error('请求失败')
+    if (error?.name === 'AbortError') {
+      assistant.content = '已停止'
+    } else {
+      assistant.content = '请求失败，请稍后重试'
+      ElMessage.error('请求失败')
+    }
   } finally {
     sending.value = false
+    abortController.value = null
     sessions.value = await listSessions()
     await scrollToBottom()
   }
+}
+
+function handleStop() {
+  abortController.value?.abort()
 }
 
 async function scrollToBottom() {

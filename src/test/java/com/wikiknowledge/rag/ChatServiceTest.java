@@ -1,27 +1,28 @@
 package com.wikiknowledge.rag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wikiknowledge.common.AICostGuardService;
 import com.wikiknowledge.domain.Message;
 import com.wikiknowledge.domain.Session;
 import com.wikiknowledge.rag.dto.ChatRequest;
 import com.wikiknowledge.repository.MessageRepository;
 import com.wikiknowledge.session.SessionService;
 import com.wikiknowledge.session.dto.CreateSessionRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
-
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -39,6 +40,9 @@ class ChatServiceTest {
     @Mock
     private MessageRepository messageRepository;
 
+    @Mock
+    private AICostGuardService aiCostGuardService;
+
     private ChatService chatService;
 
     @BeforeEach
@@ -48,7 +52,8 @@ class ChatServiceTest {
                 sessionService,
                 messageRepository,
                 new ObjectMapper(),
-                new PromptGuardService()
+                new PromptGuardService(),
+                aiCostGuardService
         );
     }
 
@@ -59,7 +64,8 @@ class ChatServiceTest {
         session.setUserId(1L);
         when(sessionService.createSession(any(CreateSessionRequest.class), any()))
                 .thenReturn(session);
-        when(ragService.chat(any(ChatRequest.class))).thenReturn(Flux.just(
+        when(messageRepository.findBySessionIdOrderByIdAsc(10L)).thenReturn(List.of());
+        when(ragService.chat(any(ChatRequest.class), anyList())).thenReturn(Flux.just(
                 event("start", Map.of("knowledgeBaseId", 1L)),
                 event("delta", Map.of("content", "你好")),
                 event("done", Map.of("citations", List.of(Map.of("chunkId", 1L))))
@@ -72,6 +78,7 @@ class ChatServiceTest {
 
         assertThat(events).hasSize(3);
         verify(messageRepository, times(2)).save(any(Message.class));
+        verify(ragService).chat(any(ChatRequest.class), anyList());
     }
 
     @Test
@@ -80,7 +87,8 @@ class ChatServiceTest {
         session.setId(20L);
         session.setUserId(1L);
         when(sessionService.getOwnedSession(20L, "alice")).thenReturn(session);
-        when(ragService.chat(any(ChatRequest.class))).thenReturn(Flux.just(
+        when(messageRepository.findBySessionIdOrderByIdAsc(20L)).thenReturn(List.of());
+        when(ragService.chat(any(ChatRequest.class), anyList())).thenReturn(Flux.just(
                 event("start", Map.of("knowledgeBaseId", 1L)),
                 event("done", Map.of("citations", List.of()))
         ));
@@ -90,6 +98,29 @@ class ChatServiceTest {
                 .block();
 
         verify(sessionService, never()).createSession(any(CreateSessionRequest.class), any());
+    }
+
+    @Test
+    void chatPassesHistoryToRag() {
+        Session session = new Session();
+        session.setId(20L);
+        session.setUserId(1L);
+        Message previous = new Message();
+        previous.setRole("user");
+        previous.setContent("上一问");
+        when(sessionService.getOwnedSession(20L, "alice")).thenReturn(session);
+        when(messageRepository.findBySessionIdOrderByIdAsc(20L)).thenReturn(List.of(previous));
+        when(ragService.chat(any(ChatRequest.class), anyList())).thenReturn(Flux.just(
+                event("start", Map.of("knowledgeBaseId", 1L)),
+                event("done", Map.of("citations", List.of()))
+        ));
+
+        chatService.chat(new ChatRequest(1L, "接着上一问", 20L, null), "alice")
+                .collectList()
+                .block();
+
+        verify(ragService).chat(eq(new ChatRequest(1L, "接着上一问", 20L, null)),
+                org.mockito.ArgumentMatchers.argThat(history -> history.size() == 1));
     }
 
     private ServerSentEvent<RagEvent> event(String type, Object data) {

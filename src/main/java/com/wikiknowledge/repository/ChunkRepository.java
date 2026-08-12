@@ -34,4 +34,21 @@ public interface ChunkRepository extends JpaRepository<Chunk, Long> {
     List<ChunkMatch> searchSimilar(@Param("knowledgeBaseId") Long knowledgeBaseId,
                                    @Param("embedding") String embedding,
                                    @Param("limit") int limit);
+
+    @Query(value = """
+            SELECT id,
+                   document_id AS documentId,
+                   knowledge_base_id AS knowledgeBaseId,
+                   content,
+                   seq_no AS seqNo,
+                   ts_rank_cd(search_vector, plainto_tsquery('simple', :query)) AS similarity
+            FROM chunks
+            WHERE knowledge_base_id = :knowledgeBaseId
+              AND search_vector @@ plainto_tsquery('simple', :query)
+            ORDER BY ts_rank_cd(search_vector, plainto_tsquery('simple', :query)) DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<ChunkMatch> searchKeywords(@Param("knowledgeBaseId") Long knowledgeBaseId,
+                                    @Param("query") String query,
+                                    @Param("limit") int limit);
 }

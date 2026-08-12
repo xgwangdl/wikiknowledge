@@ -1,10 +1,8 @@
 package com.wikiknowledge.rag;
 
-import com.wikiknowledge.ai.EmbeddingService;
 import com.wikiknowledge.domain.KnowledgeBase;
 import com.wikiknowledge.rag.dto.ChatRequest;
 import com.wikiknowledge.repository.ChunkMatch;
-import com.wikiknowledge.repository.ChunkRepository;
 import com.wikiknowledge.repository.KnowledgeBaseRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,10 +32,7 @@ class RagServiceTest {
     private KnowledgeBaseRepository knowledgeBaseRepository;
 
     @Mock
-    private ChunkRepository chunkRepository;
-
-    @Mock
-    private EmbeddingService embeddingService;
+    private HybridSearchService hybridSearchService;
 
     @Mock
     private ObjectProvider<ChatModel> chatModelProvider;
@@ -49,9 +44,7 @@ class RagServiceTest {
     void returnsErrorWhenNoRelevantContext() {
         KnowledgeBase kb = knowledgeBase(1L);
         when(knowledgeBaseRepository.findById(1L)).thenReturn(Optional.of(kb));
-        when(embeddingService.embed("问题")).thenReturn(new float[]{0.1f});
-        when(embeddingService.toVectorLiteral(any())).thenReturn("[0.1]");
-        when(chunkRepository.searchSimilar(eq(1L), eq("[0.1]"), eq(5))).thenReturn(List.of());
+        when(hybridSearchService.search(eq(1L), eq("问题"), eq(5))).thenReturn(List.of());
 
         List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题", null, null))
                 .map(serverEvent -> serverEvent.data())
@@ -67,9 +60,7 @@ class RagServiceTest {
         KnowledgeBase kb = knowledgeBase(1L);
         ChunkMatch match = chunkMatch(0.5);
         when(knowledgeBaseRepository.findById(1L)).thenReturn(Optional.of(kb));
-        when(embeddingService.embed("问题")).thenReturn(new float[]{0.1f});
-        when(embeddingService.toVectorLiteral(any())).thenReturn("[0.1]");
-        when(chunkRepository.searchSimilar(eq(1L), eq("[0.1]"), eq(5))).thenReturn(List.of(match));
+        when(hybridSearchService.search(eq(1L), eq("问题"), eq(5))).thenReturn(List.of(match));
         when(chatModelProvider.getIfAvailable()).thenReturn(null);
 
         List<RagEvent> events = ragService.chat(new ChatRequest(1L, "问题", null, null))
@@ -89,9 +80,7 @@ class RagServiceTest {
         ChunkMatch match = chunkMatch(0.5);
         ChatModel chatModel = mock(ChatModel.class);
         when(knowledgeBaseRepository.findById(1L)).thenReturn(Optional.of(kb));
-        when(embeddingService.embed("问题")).thenReturn(new float[]{0.1f});
-        when(embeddingService.toVectorLiteral(any())).thenReturn("[0.1]");
-        when(chunkRepository.searchSimilar(eq(1L), eq("[0.1]"), eq(5))).thenReturn(List.of(match));
+        when(hybridSearchService.search(eq(1L), eq("问题"), eq(5))).thenReturn(List.of(match));
         when(chatModelProvider.getIfAvailable()).thenReturn(chatModel);
         when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.empty());
 

@@ -46,6 +46,9 @@ app:
   rate-limit:
     per-minute: ${RATE_LIMIT_PER_MINUTE:20}
     per-day: ${RATE_LIMIT_PER_DAY:500}
+  ai-cost:
+    max-daily-calls: ${AI_MAX_DAILY_CALLS:100}
+    max-question-length: ${AI_MAX_QUESTION_LENGTH:2000}
 
 server:
   port: 8080
