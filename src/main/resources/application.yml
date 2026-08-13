@@ -45,6 +45,10 @@ app:
   admin:
     username: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD:admin123}
+  ai:
+    ocr-model: ${AI_OCR_MODEL:qwen-vl-plus}
+    ocr-max-pages: ${AI_OCR_MAX_PAGES:100}
+    ocr-dpi: ${AI_OCR_DPI:150}
   storage:
     root: ${STORAGE_ROOT:./data}
   rate-limit:

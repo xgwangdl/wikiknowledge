@@ -6,18 +6,24 @@ import com.wikiknowledge.document.extract.DocumentTextExtractor;
 import com.wikiknowledge.document.extract.TextQualityAnalyzer;
 import com.wikiknowledge.document.storage.LocalFileStorage;
 import com.wikiknowledge.ai.VectorizationService;
+import com.wikiknowledge.ai.PdfOcrService;
 import com.wikiknowledge.repository.ChunkRepository;
 import com.wikiknowledge.repository.DocumentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.List;/** 文档异步解析、切片与向量化 */
 
 
 @Service
 public class DocumentParser {
+
+    private static final Logger log = LoggerFactory.getLogger(DocumentParser.class);
 
     private final DocumentRepository documentRepository;
     private final ChunkRepository chunkRepository;
@@ -25,19 +31,22 @@ public class DocumentParser {
     private final TextChunker textChunker;
     private final LocalFileStorage fileStorage;
     private final VectorizationService vectorizationService;
+    private final PdfOcrService pdfOcrService;
 
     public DocumentParser(DocumentRepository documentRepository,
                           ChunkRepository chunkRepository,
                           DocumentTextExtractor textExtractor,
                           TextChunker textChunker,
                           LocalFileStorage fileStorage,
-                          VectorizationService vectorizationService) {
+                          VectorizationService vectorizationService,
+                          PdfOcrService pdfOcrService) {
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
         this.textExtractor = textExtractor;
         this.textChunker = textChunker;
         this.fileStorage = fileStorage;
         this.vectorizationService = vectorizationService;
+        this.pdfOcrService = pdfOcrService;
     }
 
     /**
@@ -67,6 +76,14 @@ public class DocumentParser {
             }
             // 3. 切片并入库
             if (TextQualityAnalyzer.isLikelyGarbled(text)) {
+                if (isPdf(document.getFilename())) {
+                    String ocrText = tryOcr(document);
+                    if (ocrText != null && !ocrText.isBlank()) {
+                        text = ocrText;
+                    }
+                }
+            }
+            if (text.isBlank() || TextQualityAnalyzer.isLikelyGarbled(text)) {
                 fail(document, "文档文本提取异常（疑似乱码）：请将 PDF 另存为带文本层的文件，或转换为 Word/Markdown 后重新上传");
                 return;
             }
@@ -99,5 +116,18 @@ public class DocumentParser {
         document.setStatus("FAILED");
         document.setErrorMessage(message.length() > 500 ? message.substring(0, 500) : message);
         documentRepository.save(document);
+    }
+
+    private String tryOcr(Document document) {
+        try (InputStream inputStream = fileStorage.read(document.getId(), document.getFilename())) {
+            return pdfOcrService.extractText(inputStream);
+        } catch (Exception ex) {
+            log.warn("PDF OCR fallback failed for document {}", document.getId(), ex);
+            return null;
+        }
+    }
+
+    private boolean isPdf(String filename) {
+        return filename != null && filename.toLowerCase(Locale.ROOT).endsWith(".pdf");
     }
 }

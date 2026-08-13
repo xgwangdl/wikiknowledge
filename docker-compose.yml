@@ -45,6 +45,9 @@ services:
       AI_BASE_URL: ${AI_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode}
       AI_CHAT_MODEL: ${AI_CHAT_MODEL:-qwen-plus}
       AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-text-embedding-v3}
+      AI_OCR_MODEL: ${AI_OCR_MODEL:-qwen-vl-plus}
+      AI_OCR_MAX_PAGES: ${AI_OCR_MAX_PAGES:-100}
+      AI_OCR_DPI: ${AI_OCR_DPI:-150}
       JWT_SECRET: ${JWT_SECRET:-wikiknowledge-dev-secret-key-change-me-2026-0123456789}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
