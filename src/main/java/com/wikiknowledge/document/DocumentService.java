@@ -12,6 +12,8 @@ import com.wikiknowledge.repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -95,7 +97,13 @@ public class DocumentService {
         documentRepository.save(document);
 
         fileStorage.save(document.getId(), filename, file);
-        documentParser.parseAsync(document.getId());
+        // 等当前事务提交后再触发异步解析，避免异步线程读不到刚插入的文档
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                documentParser.parseAsync(document.getId());
+            }
+        });
         return DocumentResponse.from(document);
     }
 

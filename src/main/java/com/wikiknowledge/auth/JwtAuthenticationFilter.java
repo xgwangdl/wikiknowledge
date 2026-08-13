@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 User user = userRepository.findByUsername(claims.getSubject()).orElse(null);
                 if (user != null && "ACTIVE".equals(user.getStatus())) {
                     var authentication = new UsernamePasswordAuthenticationToken(
-                            user, null, List.of(new SimpleGrantedAuthority(user.getRole())));
+                            user.getUsername(), null, List.of(new SimpleGrantedAuthority(user.getRole())));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (JwtException | IllegalArgumentException ex) {

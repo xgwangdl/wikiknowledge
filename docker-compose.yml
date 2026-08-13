@@ -42,7 +42,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       AI_API_KEY: ${AI_API_KEY:-dummy-key-not-configured}
-      AI_BASE_URL: ${AI_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      AI_BASE_URL: ${AI_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode}
       AI_CHAT_MODEL: ${AI_CHAT_MODEL:-qwen-plus}
       AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-text-embedding-v3}
       JWT_SECRET: ${JWT_SECRET:-wikiknowledge-dev-secret-key-change-me-2026-0123456789}

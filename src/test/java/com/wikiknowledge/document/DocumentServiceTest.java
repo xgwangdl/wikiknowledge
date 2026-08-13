@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,12 +78,22 @@ class DocumentServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "notes.md", "text/markdown", "# 标题\n内容".getBytes());
 
-        DocumentResponse response = documentService.upload(1L, file, "alice");
+        TransactionSynchronizationManager.initSynchronization();
+        try {
+            DocumentResponse response = documentService.upload(1L, file, "alice");
 
-        assertThat(response.id()).isEqualTo(10L);
-        assertThat(response.status()).isEqualTo("UPLOADED");
-        verify(documentParser).parseAsync(10L);
-        verify(fileStorage).save(eq(10L), eq("notes.md"), eq(file));
+            assertThat(response.id()).isEqualTo(10L);
+            assertThat(response.status()).isEqualTo("UPLOADED");
+            verify(documentParser, never()).parseAsync(anyLong());
+
+            // 模拟事务提交后再触发异步解析
+            TransactionSynchronizationManager.getSynchronizations()
+                    .forEach(TransactionSynchronization::afterCommit);
+            verify(documentParser).parseAsync(10L);
+            verify(fileStorage).save(eq(10L), eq("notes.md"), eq(file));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
     }
 
     @Test

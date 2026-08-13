@@ -57,9 +57,10 @@ public class HybridSearchService {
                                  List<ChunkMatch> keywordResults,
                                  int topK) {
         Map<Long, Double> scores = new HashMap<>();
+        Map<Long, Double> bestSimilarity = new HashMap<>();
         Map<Long, ChunkMatch> byId = new HashMap<>();
-        addRanking(vectorResults, scores, byId);
-        addRanking(keywordResults, scores, byId);
+        addRanking(vectorResults, scores, bestSimilarity, byId);
+        addRanking(keywordResults, scores, bestSimilarity, byId);
 
         List<Map.Entry<Long, Double>> sorted = new ArrayList<>(scores.entrySet());
         sorted.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
@@ -74,7 +75,7 @@ public class HybridSearchService {
                             match.getKnowledgeBaseId(),
                             match.getContent(),
                             match.getSeqNo(),
-                            entry.getValue()
+                            bestSimilarity.getOrDefault(entry.getKey(), 0.0)
                     );
                 })
                 .collect(java.util.stream.Collectors.toList());
@@ -83,11 +84,14 @@ public class HybridSearchService {
 
     private void addRanking(List<ChunkMatch> results,
                             Map<Long, Double> scores,
+                            Map<Long, Double> bestSimilarity,
                             Map<Long, ChunkMatch> byId) {
         for (int i = 0; i < results.size(); i++) {
             ChunkMatch match = results.get(i);
             scores.merge(match.getId(), 1.0 / (RRF_K + i + 1), Double::sum);
             byId.putIfAbsent(match.getId(), match);
+            double similarity = match.getSimilarity() == null ? 0.0 : match.getSimilarity();
+            bestSimilarity.merge(match.getId(), similarity, Math::max);
         }
     }
 }

@@ -24,7 +24,7 @@ spring:
       password: ${REDIS_PASSWORD:}
   ai:
     openai:
-      base-url: ${AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+      base-url: ${AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
       api-key: ${AI_API_KEY:dummy-key-not-configured}
       chat:
         options:

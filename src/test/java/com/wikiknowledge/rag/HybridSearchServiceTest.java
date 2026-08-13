@@ -45,7 +45,8 @@ class HybridSearchServiceTest {
 
         assertThat(results).hasSize(2);
         assertThat(results.get(0).getId()).isEqualTo(2L);
-        assertThat(results.get(0).getSimilarity()).isGreaterThan(results.get(1).getSimilarity());
+        assertThat(results.get(0).getSimilarity()).isEqualTo(0.8d);
+        assertThat(results.get(1).getSimilarity()).isEqualTo(0.8d);
     }
 
     private ChunkMatch chunkMatch(Long id) {
@@ -55,6 +56,7 @@ class HybridSearchServiceTest {
         lenient().when(match.getKnowledgeBaseId()).thenReturn(1L);
         lenient().when(match.getContent()).thenReturn("内容" + id);
         lenient().when(match.getSeqNo()).thenReturn(id.intValue());
+        lenient().when(match.getSimilarity()).thenReturn(0.8d);
         return match;
     }
 }
