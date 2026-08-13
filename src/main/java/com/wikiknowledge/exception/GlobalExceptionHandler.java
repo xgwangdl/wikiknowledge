@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;/** 全局异常处理，统一返回 ApiError */
 
 
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleRateLimit(RateLimitException ex) {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(new ApiError(429, "RATE_LIMITED", ex.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiError> handleUploadSize(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ApiError(400, "FILE_TOO_LARGE", "文件大小不能超过 20MB"));
     }
 
     @ExceptionHandler(Exception.class)

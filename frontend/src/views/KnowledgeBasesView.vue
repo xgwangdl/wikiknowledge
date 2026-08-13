@@ -82,6 +82,7 @@ const fileInputs = ref({})
 const activeCollapse = ref([])
 const dialogVisible = ref(false)
 const form = reactive({ name: '', description: '' })
+const MAX_FILE_SIZE = 20 * 1024 * 1024
 
 onMounted(load)
 
@@ -116,10 +117,20 @@ async function handleDeleteKnowledgeBase(kb) {
 async function handleUpload(kb, event) {
   const file = event.target.files[0]
   if (!file) return
-  await uploadDocument(kb.id, file)
-  ElMessage.success('上传成功，正在解析')
-  event.target.value = ''
-  await loadDocuments(kb)
+  if (file.size > MAX_FILE_SIZE) {
+    ElMessage.error('文件大小不能超过 20MB')
+    event.target.value = ''
+    return
+  }
+  try {
+    await uploadDocument(kb.id, file)
+    ElMessage.success('上传成功，正在解析')
+  } catch (err) {
+    ElMessage.error(err.response?.data?.message || '上传失败，请重试')
+  } finally {
+    event.target.value = ''
+    await loadDocuments(kb)
+  }
 }
 
 async function handleDeleteDocument(document) {

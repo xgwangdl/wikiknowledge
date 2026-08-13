@@ -3,6 +3,10 @@ spring:
     name: wikiknowledge
   profiles:
     default: local
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 21MB
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/wikiknowledge}
     username: ${DB_USERNAME:wikiknowledge}
