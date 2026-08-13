@@ -3,6 +3,7 @@ package com.wikiknowledge.document;
 import com.wikiknowledge.domain.Chunk;
 import com.wikiknowledge.domain.Document;
 import com.wikiknowledge.document.extract.DocumentTextExtractor;
+import com.wikiknowledge.document.extract.TextQualityAnalyzer;
 import com.wikiknowledge.document.storage.LocalFileStorage;
 import com.wikiknowledge.ai.VectorizationService;
 import com.wikiknowledge.repository.ChunkRepository;
@@ -65,6 +66,10 @@ public class DocumentParser {
                 return;
             }
             // 3. 切片并入库
+            if (TextQualityAnalyzer.isLikelyGarbled(text)) {
+                fail(document, "文档文本提取异常（疑似乱码）：请将 PDF 另存为带文本层的文件，或转换为 Word/Markdown 后重新上传");
+                return;
+            }
             List<String> chunks = textChunker.chunk(text);
             chunkRepository.deleteByDocumentId(document.getId());
             List<com.wikiknowledge.domain.Chunk> savedChunks = new ArrayList<>();

@@ -3,6 +3,7 @@
     <div class="toolbar">
       <h2>知识库管理</h2>
       <el-button type="primary" @click="dialogVisible = true">新建知识库</el-button>
+      <el-button :loading="loading" :icon="Refresh" @click="load">刷新</el-button>
     </div>
 
     <el-collapse v-model="activeCollapse">
@@ -30,7 +31,7 @@
           </el-button>
         </div>
 
-        <el-table :data="documents[kb.id] || []" size="small" @expand-change="() => loadDocuments(kb)">
+        <el-table :data="documents[kb.id] || []" size="small">
           <el-table-column prop="filename" label="文件名" />
           <el-table-column prop="status" label="状态" width="120">
             <template #default="{ row }">
@@ -67,6 +68,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Refresh } from '@element-plus/icons-vue'
 import {
   createKnowledgeBase,
   deleteDocument,
@@ -83,11 +85,18 @@ const activeCollapse = ref([])
 const dialogVisible = ref(false)
 const form = reactive({ name: '', description: '' })
 const MAX_FILE_SIZE = 20 * 1024 * 1024
+const loading = ref(false)
 
 onMounted(load)
 
 async function load() {
-  knowledgeBases.value = await listKnowledgeBases()
+  loading.value = true
+  try {
+    knowledgeBases.value = await listKnowledgeBases()
+    await Promise.all(knowledgeBases.value.map((kb) => loadDocuments(kb)))
+  } finally {
+    loading.value = false
+  }
 }
 
 async function loadDocuments(kb) {
